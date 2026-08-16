@@ -495,7 +495,9 @@ function App() {
         return (
             <div className="min-h-screen bg-app-gradient flex items-center justify-center p-4 font-sans text-gray-800 relative overflow-hidden">
                 <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
-                    <h1 className="text-4xl font-extrabold text-[#4a8f9c] mb-8 tracking-wider">ROLLINO</h1>
+                    <div className="flex justify-center mb-8">
+                        <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-48 h-auto logo-themed" />
+                    </div>
                     
                     <div className="space-y-6 mb-8 text-left">
                         <div>
@@ -544,10 +546,6 @@ function App() {
         );
     }
 
-    const panelColourClass = currentPlayer === 'p1' 
-        ? 'bg-gradient-to-b from-[#f95757] to-[#d62828] border-[#a81a1a]' 
-        : 'bg-gradient-to-b from-[#4bb0ff] to-[#1a7cd8] border-[#0e5091]';
-
     const isBotTurn = currentPlayer === 'p2' && players.p2.isBot;
     const isRollDisabled = gamePhase !== 'playing' || diceRolling || currentRoll !== null || isBotTurn;
 
@@ -589,14 +587,18 @@ function App() {
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
                     
-                    <div className="bg-[#6b9ca3]/80 backdrop-blur-md px-4 py-2 rounded-full flex gap-4 items-center shadow-inner border border-white/20">
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-[#ed404c] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
-                            <span className="text-white font-bold text-lg">{scores.p1}</span>
+                    <div className="flex items-center justify-center flex-1 px-3">
+                        <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-28 h-auto logo-themed" />
+                    </div>
+                    
+                    <div className="bg-[#6b9ca3]/80 backdrop-blur-md px-3 py-2 rounded-full flex gap-3 items-center shadow-inner border border-white/20">
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-3.5 h-3.5 rounded-full bg-[#ed404c] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
+                            <span className="text-white font-bold text-base">{scores.p1}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-[#298de6] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
-                            <span className="text-white font-bold text-lg">{scores.p2}</span>
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-3.5 h-3.5 rounded-full bg-[#298de6] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
+                            <span className="text-white font-bold text-base">{scores.p2}</span>
                         </div>
                     </div>
                 </div>
