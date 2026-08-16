@@ -7,28 +7,31 @@
                     radial-gradient(circle at 50% 100%, #68b9c2 0%, transparent 70%);
 }
 
-.glass-token-red {
-  background: radial-gradient(circle at 30% 30%, #ff9e9e 0%, #ed404c 40%, #b3121d 100%);
-  box-shadow: 
-    inset -3px -3px 8px rgba(0,0,0,0.3), 
-    inset 3px 3px 8px rgba(255,255,255,0.6), 
-    0 4px 6px rgba(0,0,0,0.3);
-}
-
-.glass-token-blue {
-  background: radial-gradient(circle at 30% 30%, #8ac7ff 0%, #298de6 40%, #0a5699 100%);
-  box-shadow: 
-    inset -3px -3px 8px rgba(0,0,0,0.3), 
-    inset 3px 3px 8px rgba(255,255,255,0.6), 
-    0 4px 6px rgba(0,0,0,0.3);
-}
-
 .shadow-board {
   box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 2px 5px rgba(255,255,255,0.4);
 }
 
 /* =========================================
-   2. 3D DICE & ANIMATIONS
+   2. 3D TOKENS (Cartoony/Chunky look)
+========================================= */
+.token-3d-red {
+  background: linear-gradient(to bottom, #ff7b84, #e63946);
+  box-shadow: 
+    inset 0 2px 2px rgba(255, 255, 255, 0.4), /* Top highlight */
+    0 4px 0 #bd1824,                          /* Hard 3D thickness */
+    0 8px 10px rgba(0, 0, 0, 0.2);            /* Soft drop shadow */
+}
+
+.token-3d-blue {
+  background: linear-gradient(to bottom, #6ec0ff, #298de6);
+  box-shadow: 
+    inset 0 2px 2px rgba(255, 255, 255, 0.4), /* Top highlight */
+    0 4px 0 #1562ad,                          /* Hard 3D thickness */
+    0 8px 10px rgba(0, 0, 0, 0.2);            /* Soft drop shadow */
+}
+
+/* =========================================
+   3. 3D DICE & ANIMATIONS
 ========================================= */
 .dice-scene { 
   width: 64px; 
@@ -77,7 +80,7 @@
 }
 
 /* =========================================
-   3. CUSTOM SCROLLBARS
+   4. CUSTOM SCROLLBARS
 ========================================= */
 .instructions-scroll::-webkit-scrollbar {
   width: 6px;
