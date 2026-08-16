@@ -364,7 +364,6 @@ function App() {
                         let score = 0;
                         const lines = [];
                         
-                        // Rows, Cols, Diagonals logic
                         for(let r = 0; r < 6; r++) for(let c = 0; c < 3; c++) lines.push([r*6+c, r*6+c+1, r*6+c+2, r*6+c+3]);
                         for(let c = 0; c < 6; c++) for(let r = 0; r < 3; r++) lines.push([(r)*6+c, (r+1)*6+c, (r+2)*6+c, (r+3)*6+c]);
                         for(let r = 0; r < 3; r++) for(let c = 0; c < 3; c++) lines.push([(r)*6+c, (r+1)*6+c+1, (r+2)*6+c+2, (r+3)*6+c+3]);
@@ -418,7 +417,7 @@ function App() {
        RENDER: SETUP VIEW
     ========================================================================== */
     const renderSetup = () => (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-[100dvh] flex flex-col items-center justify-center p-4 relative overflow-hidden">
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
                 <div className="flex justify-center mb-8">
                     <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-48 h-auto drop-shadow-md" />
@@ -468,7 +467,7 @@ function App() {
        RENDER: INSTRUCTIONS VIEW
     ========================================================================== */
     const renderInstructions = () => (
-        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-[100dvh] flex items-center justify-center p-4 relative overflow-hidden">
             <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-[32px] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col relative z-10">
                 <h2 className="text-3xl font-extrabold text-[#4a8f9c] mb-6 text-center tracking-wide">HOW TO PLAY</h2>
 
@@ -543,11 +542,15 @@ function App() {
         }
 
         return (
-            <div className="min-h-screen flex items-start sm:items-center justify-center sm:p-4">
-                <div className="w-full min-h-screen sm:min-h-0 sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
+            <div className="min-h-[100dvh] flex items-start sm:items-center justify-center sm:p-4">
+                {/* 
+                  REMOVED min-h-screen here so the container on mobile only grows to exactly wrap 
+                  the header, board, and footer. This prevents elements stretching out of view!
+                */}
+                <div className="w-full sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
                     
                     {/* HEADER */}
-                    <div className="px-5 pt-8 sm:pt-6 pb-4 flex justify-between items-center z-10 relative">
+                    <div className="px-5 pt-10 sm:pt-6 pb-4 flex justify-between items-center z-10 relative">
                         <button onClick={() => setGamePhase('setup')} className="w-12 h-12 bg-white/40 hover:bg-white/60 rounded-[14px] flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors text-[#5a9a9c]">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
@@ -569,7 +572,7 @@ function App() {
                     </div>
 
                     {/* BOARD AREA */}
-                    <div className="flex-1 px-4 sm:px-6 flex items-center justify-center z-10 relative">
+                    <div className="px-4 sm:px-6 py-4 flex-1 flex items-center justify-center z-10 relative">
                         <div className="w-full aspect-square max-w-[380px] shadow-board bg-[#d19e71] rounded-[16px] p-[6px] sm:p-2 relative mx-auto">
                             <div className="absolute inset-1 rounded-[12px] bg-[#bf8656] shadow-[inset_0_5px_15px_rgba(0,0,0,0.3)] border border-[#a6714a] pointer-events-none"></div>
                             
@@ -596,7 +599,7 @@ function App() {
                     </div>
 
                     {/* BOTTOM CONTROL PANEL */}
-                    <div className="mt-auto px-4 pb-8 sm:pb-6 pt-2 z-10 relative">
+                    <div className="px-4 pb-10 sm:pb-6 pt-2 z-10 relative mt-auto">
                         <div className={`rounded-[24px] relative flex flex-col items-center p-5 transition-shadow duration-700 ${panelOuterShadowClass}`}>
                             <div className="absolute inset-0 bg-gradient-to-b from-[#f95757] to-[#d62828] border-[4px] border-[#a81a1a] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden" />
 
