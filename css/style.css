@@ -42,8 +42,16 @@
    3. 3D DICE & ANIMATIONS
 ========================================= */
 .dice-scene { 
-  width: 64px; 
-  height: 64px; 
+  /*
+   * The faces are intentionally inset by 4px from the mathematical surface
+   * of a 64px cube. That small overlap makes adjacent rounded faces interlock
+   * behind one another, filling the holes that border-radius would otherwise
+   * leave at the cube's edges and vertices.
+   */
+  --dice-size: 64px;
+  --dice-face-depth: 28px;
+  width: var(--dice-size); 
+  height: var(--dice-size); 
   perspective: 600px; 
 }
 
@@ -57,20 +65,30 @@
 
 .dice-face { 
   position: absolute; 
-  width: 64px; 
-  height: 64px; 
+  width: var(--dice-size); 
+  height: var(--dice-size); 
   background: #ffffff; 
   border-radius: 10px; 
   border: 1px solid #e0e0e0;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.05); 
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
 }
 
-.dice-face-front  { transform: rotateY(0deg) translateZ(32px); }
-.dice-face-back   { transform: rotateY(180deg) translateZ(32px); }
-.dice-face-right  { transform: rotateY(90deg) translateZ(32px); }
-.dice-face-left   { transform: rotateY(-90deg) translateZ(32px); }
-.dice-face-top    { transform: rotateX(90deg) translateZ(32px); }
-.dice-face-bottom { transform: rotateX(-90deg) translateZ(32px); }
+/*
+ * Do not place the faces at 32px (half of 64px): rounded corners then meet
+ * at an empty point. Moving every face inward to 28px creates a 4px overlap.
+ * The visible face still has a 10px radius, while neighbouring faces sit
+ * immediately behind its cut-away corners, so the die reads as one solid,
+ * softly rounded object instead of a hollow box.
+ */
+.dice-face-front  { transform: rotateY(0deg) translateZ(var(--dice-face-depth)); }
+.dice-face-back   { transform: rotateY(180deg) translateZ(var(--dice-face-depth)); }
+.dice-face-right  { transform: rotateY(90deg) translateZ(var(--dice-face-depth)); }
+.dice-face-left   { transform: rotateY(-90deg) translateZ(var(--dice-face-depth)); }
+.dice-face-top    { transform: rotateX(90deg) translateZ(var(--dice-face-depth)); }
+.dice-face-bottom { transform: rotateX(-90deg) translateZ(var(--dice-face-depth)); }
 
 .dice-jumping {
   animation: dice-bounce 1.2s linear forwards;
