@@ -1,18 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,600,1,0');
-
-.material-symbols-rounded {
-  font-family: 'Material Symbols Rounded';
-  font-weight: 600;
-  font-style: normal;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-smoothing: antialiased;
-}
-
 .glass-token-red {
   background: radial-gradient(circle at 30% 30%, #ff9e9e 0%, #ed404c 40%, #b3121d 100%);
   box-shadow: 
@@ -86,4 +71,9 @@
 .instructions-scroll::-webkit-scrollbar-thumb {
   background: rgba(74,143,156,0.5);
   border-radius: 4px;
+}
+
+/* Recolour SVG logo using CSS filter to match rgb(74 143 156) */
+.logo-themed {
+  filter: brightness(0) saturate(100%) invert(52%) sepia(18%) saturate(1034%) hue-rotate(136deg) brightness(93%) contrast(89%);
 }
