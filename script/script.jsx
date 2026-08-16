@@ -189,8 +189,8 @@ const PipLayout = ({ val }) => {
 
 const Token = ({ color, animate }) => (
     <div className={`absolute inset-[15%] rounded-full transform transition-all duration-300 z-20 
-        ${animate ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}
-        ${color === 'red' ? 'glass-token-red' : 'glass-token-blue'}
+        ${animate ? 'scale-100 opacity-100 mb-1' : 'scale-50 opacity-0 mb-0'}
+        ${color === 'red' ? 'token-3d-red' : 'token-3d-blue'}
     `}></div>
 );
 
@@ -428,7 +428,7 @@ function App() {
                     <div>
                         <label className="text-sm font-bold text-gray-500 uppercase tracking-wide ml-2 mb-1 block">Player 1</label>
                         <div className="relative">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#ed404c] shadow-inner"></div>
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-b from-[#ff7b84] to-[#e63946] shadow-[0_2px_0_#bd1824,inset_0_1px_2px_rgba(255,255,255,0.4)]"></div>
                             <input type="text" value={players.p1.name} onChange={e => setPlayers({...players, p1: {...players.p1, name: e.target.value}})} className="w-full bg-gray-100/50 text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent focus:bg-white transition-all font-medium" maxLength={12} />
                         </div>
                     </div>
@@ -442,7 +442,7 @@ function App() {
                             </div>
                         </div>
                         <div className="relative">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#298de6] shadow-inner"></div>
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-b from-[#6ec0ff] to-[#298de6] shadow-[0_2px_0_#1562ad,inset_0_1px_2px_rgba(255,255,255,0.4)]"></div>
                             <input type="text" value={players.p2.name} disabled={players.p2.isBot} onChange={e => setPlayers({...players, p2: {...players.p2, name: e.target.value}})} className={`w-full text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent transition-all font-medium ${players.p2.isBot ? 'bg-gray-200/50 text-gray-500 cursor-not-allowed' : 'bg-gray-100/50 focus:bg-white'}`} maxLength={12} />
                         </div>
                     </div>
@@ -540,10 +540,6 @@ function App() {
 
         return (
             <div className="min-h-screen flex items-center justify-center sm:p-4">
-                {/* 
-                  The background is completely removed here so the container acts purely as a wrapper.
-                  It will effortlessly inherit the continuous aqua gradient set on the <body> tag in HTML.
-                */}
                 <div className="w-full h-full sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
                     
                     {/* HEADER */}
@@ -558,11 +554,11 @@ function App() {
                         
                         <div className="bg-[#6b9ca3]/80 backdrop-blur-md px-3 py-2 rounded-full flex gap-3 items-center shadow-inner border border-white/20">
                             <div className="flex items-center gap-1.5">
-                                <div className="w-3.5 h-3.5 rounded-full bg-[#ed404c] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
+                                <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-b from-[#ff7b84] to-[#e63946] shadow-[0_2px_0_#bd1824,inset_0_1px_2px_rgba(255,255,255,0.4)]"></div>
                                 <span className="text-white font-bold text-base">{scores.p1}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
-                                <div className="w-3.5 h-3.5 rounded-full bg-[#298de6] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
+                                <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-b from-[#6ec0ff] to-[#298de6] shadow-[0_2px_0_#1562ad,inset_0_1px_2px_rgba(255,255,255,0.4)]"></div>
                                 <span className="text-white font-bold text-base">{scores.p2}</span>
                             </div>
                         </div>
