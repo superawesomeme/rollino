@@ -187,9 +187,10 @@ const PipLayout = ({ val }) => {
     );
 };
 
+// Fixed Token element with strict aspect ratio and true 1:1 circular rounding
 const Token = ({ color, animate }) => (
-    <div className={`absolute inset-[15%] rounded-full transform transition-all duration-300 z-20 
-        ${animate ? 'scale-100 opacity-100 mb-1' : 'scale-50 opacity-0 mb-0'}
+    <div className={`absolute inset-0 m-auto w-[70%] aspect-square rounded-full transform transition-all duration-300 z-20 
+        ${animate ? 'scale-100 opacity-100 -translate-y-[2px]' : 'scale-50 opacity-0 translate-y-0'}
         ${color === 'red' ? 'token-3d-red' : 'token-3d-blue'}
     `}></div>
 );
@@ -418,7 +419,7 @@ function App() {
        RENDER: SETUP VIEW
     ========================================================================== */
     const renderSetup = () => (
-        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
                 <div className="flex justify-center mb-8">
                     <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-48 h-auto drop-shadow-md" />
@@ -455,6 +456,10 @@ function App() {
                     <button onClick={() => setGamePhase('instructions')} className="w-full bg-gray-100/50 hover:bg-gray-200/80 text-[#4a8f9c] font-bold text-lg py-3 rounded-full shadow-[0_4px_0_rgba(74,143,156,0.15)] active:shadow-[0_0px_0_rgba(74,143,156,0.15)] active:translate-y-[4px] transition-all border border-black/5">
                         HOW TO PLAY
                     </button>
+                </div>
+                
+                <div className="mt-8 text-xs font-semibold text-[#4a8f9c]/70 tracking-wider uppercase">
+                    Created by Richard and Shaun Daubney
                 </div>
             </div>
         </div>
