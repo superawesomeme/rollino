@@ -16,18 +16,26 @@
 ========================================= */
 .token-3d-red {
   background: linear-gradient(to bottom, #ff7b84, #e63946);
+  /* Stacking shadows pixel-by-pixel ensures a perfectly solid, smooth 3D edge */
   box-shadow: 
-    inset 0 2px 2px rgba(255, 255, 255, 0.4), /* Top highlight */
-    0 4px 0 #bd1824,                          /* Hard 3D thickness */
-    0 8px 10px rgba(0, 0, 0, 0.2);            /* Soft drop shadow */
+    inset 0 2px 2px rgba(255, 255, 255, 0.4), 
+    0 1px 0 #bd1824,                          
+    0 2px 0 #bd1824,                          
+    0 3px 0 #bd1824,                          
+    0 4px 0 #bd1824,                          
+    0 8px 10px rgba(0, 0, 0, 0.2);            
 }
 
 .token-3d-blue {
   background: linear-gradient(to bottom, #6ec0ff, #298de6);
+  /* Stacking shadows pixel-by-pixel ensures a perfectly solid, smooth 3D edge */
   box-shadow: 
-    inset 0 2px 2px rgba(255, 255, 255, 0.4), /* Top highlight */
-    0 4px 0 #1562ad,                          /* Hard 3D thickness */
-    0 8px 10px rgba(0, 0, 0, 0.2);            /* Soft drop shadow */
+    inset 0 2px 2px rgba(255, 255, 255, 0.4), 
+    0 1px 0 #1562ad,                          
+    0 2px 0 #1562ad,                          
+    0 3px 0 #1562ad,                          
+    0 4px 0 #1562ad,                          
+    0 8px 10px rgba(0, 0, 0, 0.2);            
 }
 
 /* =========================================
