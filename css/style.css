@@ -16,7 +16,6 @@
 ========================================= */
 .token-3d-red {
   background: linear-gradient(to bottom, #ff7b84, #e63946);
-  /* Stacking shadows pixel-by-pixel ensures a perfectly solid, smooth 3D edge */
   box-shadow: 
     inset 0 2px 2px rgba(255, 255, 255, 0.4), 
     0 1px 0 #bd1824,                          
@@ -28,7 +27,6 @@
 
 .token-3d-blue {
   background: linear-gradient(to bottom, #6ec0ff, #298de6);
-  /* Stacking shadows pixel-by-pixel ensures a perfectly solid, smooth 3D edge */
   box-shadow: 
     inset 0 2px 2px rgba(255, 255, 255, 0.4), 
     0 1px 0 #1562ad,                          
@@ -42,12 +40,6 @@
    3. 3D DICE & ANIMATIONS
 ========================================= */
 .dice-scene { 
-  /*
-   * The faces are intentionally inset by 4px from the mathematical surface
-   * of a 64px cube. That small overlap makes adjacent rounded faces interlock
-   * behind one another, filling the holes that border-radius would otherwise
-   * leave at the cube's edges and vertices.
-   */
   --dice-size: 64px;
   --dice-face-depth: 28px;
   width: var(--dice-size); 
@@ -76,13 +68,6 @@
   overflow: hidden;
 }
 
-/*
- * Do not place the faces at 32px (half of 64px): rounded corners then meet
- * at an empty point. Moving every face inward to 28px creates a 4px overlap.
- * The visible face still has a 10px radius, while neighbouring faces sit
- * immediately behind its cut-away corners, so the die reads as one solid,
- * softly rounded object instead of a hollow box.
- */
 .dice-face-front  { transform: rotateY(0deg) translateZ(var(--dice-face-depth)); }
 .dice-face-back   { transform: rotateY(180deg) translateZ(var(--dice-face-depth)); }
 .dice-face-right  { transform: rotateY(90deg) translateZ(var(--dice-face-depth)); }
