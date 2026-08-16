@@ -1,6 +1,8 @@
 const { useState, useEffect, useRef } = React;
 
-// CONSTANTS & HELPERS
+/* ==========================================================================
+   CONSTANTS & GAME LOGIC HELPERS
+========================================================================== */
 const DICE_ROTATIONS = {
     1: { x: 0, y: 0 },
     2: { x: -90, y: 0 },
@@ -86,7 +88,9 @@ const claimWilds = (currentBoard, pId) => {
     return { newBoard: boardCopy, changed };
 };
 
-// SUB-COMPONENTS
+/* ==========================================================================
+   UI SUB-COMPONENTS
+========================================================================== */
 const Fireworks = ({ winnerColour }) => {
     const canvasRef = useRef(null);
 
@@ -107,7 +111,7 @@ const Fireworks = ({ winnerColour }) => {
         const getColour = () => {
             if (winnerColour === 'red') return `hsl(${Math.random() * 20 + 345}, 100%, 60%)`;
             if (winnerColour === 'blue') return `hsl(${Math.random() * 30 + 195}, 100%, 60%)`;
-            return `hsl(${Math.random() * 360}, 100%, 60%)`; // Draw
+            return `hsl(${Math.random() * 360}, 100%, 60%)`; 
         };
 
         const createExplosion = (x, y) => {
@@ -130,16 +134,13 @@ const Fireworks = ({ winnerColour }) => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             if (Math.random() < 0.04) {
-                createExplosion(
-                    Math.random() * canvas.width, 
-                    (Math.random() * canvas.height * 0.6) 
-                );
+                createExplosion(Math.random() * canvas.width, Math.random() * canvas.height * 0.6);
             }
 
             particles.forEach((p, i) => {
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vy += 0.1; // gravity
+                p.vy += 0.1; 
                 p.life -= p.decay;
                 
                 if (p.life <= 0) {
@@ -157,19 +158,13 @@ const Fireworks = ({ winnerColour }) => {
         };
 
         render();
-
         return () => {
             window.removeEventListener('resize', resize);
             cancelAnimationFrame(animationFrameId);
         };
     }, [winnerColour]);
 
-    return (
-        <canvas 
-            ref={canvasRef} 
-            className="absolute inset-0 z-0 pointer-events-none w-full h-full"
-        />
-    );
+    return <canvas ref={canvasRef} className="absolute inset-0 z-0 pointer-events-none w-full h-full" />;
 };
 
 const PipLayout = ({ val }) => {
@@ -199,23 +194,15 @@ const Token = ({ color, animate }) => (
     `}></div>
 );
 
-const Cell = ({ cell, onClick, isValid, isLeft }) => {
-    return (
-        <div 
-            onClick={onClick}
-            className={`
-                relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent
-                ${isLeft ? 'border-r-2 border-[#d4bca4]' : ''}
-            `}
-        >
-            <PipLayout val={cell.value} />
-            {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} animate={true} />}
-            {isValid && (
-                <div className="absolute inset-0 rounded-[8px] border-[3px] border-[#ffd659] shadow-[inset_0_0_10px_rgba(255,214,89,0.5)] animate-pulse pointer-events-none z-10"></div>
-            )}
-        </div>
-    );
-};
+const Cell = ({ cell, onClick, isValid, isLeft }) => (
+    <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'border-r-2 border-[#d4bca4]' : ''}`}>
+        <PipLayout val={cell.value} />
+        {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} animate={true} />}
+        {isValid && (
+            <div className="absolute inset-0 rounded-[8px] border-[3px] border-[#ffd659] shadow-[inset_0_0_10px_rgba(255,214,89,0.5)] animate-pulse pointer-events-none z-10"></div>
+        )}
+    </div>
+);
 
 const Dice = ({ rolling, value }) => {
     const [spins, setSpins] = useState(0);
@@ -249,8 +236,11 @@ const Dice = ({ rolling, value }) => {
     );
 };
 
-// MAIN APP COMPONENT
+/* ==========================================================================
+   MAIN APPLICATION COMPONENT
+========================================================================== */
 function App() {
+    // --- STATE MANAGEMENT ---
     const [players, setPlayers] = useState({
         p1: { name: 'Player 1', color: 'red' },
         p2: { name: 'Player 2', color: 'blue', isBot: false }
@@ -266,6 +256,7 @@ function App() {
     const [winner, setWinner] = useState(null);
     const [notification, setNotification] = useState('');
 
+    // --- GAME ACTIONS ---
     const startGame = (nextMatch = false) => {
         setBoard(generateGame());
         setGamePhase('playing');
@@ -352,16 +343,13 @@ function App() {
         });
     };
 
-    // BOT LOGIC EFFECT
+    // --- AI BOT LOGIC ---
     useEffect(() => {
         if (gamePhase !== 'playing' || currentPlayer !== 'p2' || !players.p2.isBot) return;
 
         let timeoutId;
-
         if (currentRoll === null && !diceRolling) {
-            timeoutId = setTimeout(() => {
-                handleRoll();
-            }, 1500); 
+            timeoutId = setTimeout(() => handleRoll(), 1500); 
         } else if (currentRoll !== null && !diceRolling) {
             const validMoves = board.filter(c => c.value === currentRoll && c.owner === null);
             
@@ -369,7 +357,6 @@ function App() {
                 timeoutId = setTimeout(() => {
                     let bestScore = -Infinity;
                     let bestMoves = [];
-                    
                     const oppId = 'p1';
                     const myId = 'p2';
 
@@ -377,18 +364,11 @@ function App() {
                         let score = 0;
                         const lines = [];
                         
-                        for(let r = 0; r < 6; r++) {
-                            for(let c = 0; c < 3; c++) lines.push([r*6+c, r*6+c+1, r*6+c+2, r*6+c+3]);
-                        }
-                        for(let c = 0; c < 6; c++) {
-                            for(let r = 0; r < 3; r++) lines.push([(r)*6+c, (r+1)*6+c, (r+2)*6+c, (r+3)*6+c]);
-                        }
-                        for(let r = 0; r < 3; r++) {
-                            for(let c = 0; c < 3; c++) lines.push([(r)*6+c, (r+1)*6+c+1, (r+2)*6+c+2, (r+3)*6+c+3]);
-                        }
-                        for(let r = 0; r < 3; r++) {
-                            for(let c = 3; c < 6; c++) lines.push([(r)*6+c, (r+1)*6+c-1, (r+2)*6+c-2, (r+3)*6+c-3]);
-                        }
+                        // Rows, Cols, Diagonals logic
+                        for(let r = 0; r < 6; r++) for(let c = 0; c < 3; c++) lines.push([r*6+c, r*6+c+1, r*6+c+2, r*6+c+3]);
+                        for(let c = 0; c < 6; c++) for(let r = 0; r < 3; r++) lines.push([(r)*6+c, (r+1)*6+c, (r+2)*6+c, (r+3)*6+c]);
+                        for(let r = 0; r < 3; r++) for(let c = 0; c < 3; c++) lines.push([(r)*6+c, (r+1)*6+c+1, (r+2)*6+c+2, (r+3)*6+c+3]);
+                        for(let r = 0; r < 3; r++) for(let c = 3; c < 6; c++) lines.push([(r)*6+c, (r+1)*6+c-1, (r+2)*6+c-2, (r+3)*6+c-3]);
 
                         for(let line of lines) {
                             let myCount = 0, oppCount = 0;
@@ -418,7 +398,6 @@ function App() {
                         simBoard = claimWilds(simBoard, myId).newBoard;
                         
                         let score = evaluateBoard(simBoard);
-                        
                         if (score > bestScore) {
                             bestScore = score;
                             bestMoves = [move];
@@ -432,268 +411,260 @@ function App() {
                 }, 1200); 
             }
         }
-
         return () => clearTimeout(timeoutId);
     }, [currentPlayer, currentRoll, gamePhase, diceRolling, players.p2.isBot, board]);
 
-    // INSTRUCTIONS VIEW
-    if (gamePhase === 'instructions') {
-        return (
-            <div className="min-h-screen bg-app-gradient flex items-center justify-center p-4 font-sans text-gray-800 relative overflow-hidden">
-                <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-[32px] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col relative z-10">
-                    <h2 className="text-3xl font-extrabold text-[#4a8f9c] mb-6 text-center tracking-wide">HOW TO PLAY</h2>
-
-                    <div className="flex-1 overflow-y-auto pr-3 space-y-6 text-left text-sm sm:text-base instructions-scroll">
-                        <section>
-                            <h3 className="font-bold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
-                                <span className="bg-[#4a8f9c] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> 
-                                Objective
-                            </h3>
-                            <p className="text-gray-600">Be the first player to make a continuous line of 4 tiles in a row (horizontally, vertically or diagonally).</p>
-                        </section>
-
-                        <section>
-                            <h3 className="font-bold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
-                                <span className="bg-[#4a8f9c] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span> 
-                                Setup
-                            </h3>
-                            <p className="text-gray-600">The dominoes are randomly arranged into a 6x6 grid. Each player is assigned a set of coloured tiles.</p>
-                        </section>
-
-                        <section>
-                            <h3 className="font-bold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
-                                <span className="bg-[#4a8f9c] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span> 
-                                Game Flow
-                            </h3>
-                            <ul className="list-disc pl-5 text-gray-600 space-y-2">
-                                <li>Players take turns rolling the die.</li>
-                                <li>Cover one square showing the matching number with one of your coloured tiles.</li>
-                                <li>If you roll a number that no longer appears on the board, you forfeit that roll and your turn ends.</li>
-                            </ul>
-                        </section>
-
-                        <section>
-                            <h3 className="font-bold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
-                                <span className="bg-[#4a8f9c] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span> 
-                                Bonus Wild Tiles
-                            </h3>
-                            <p className="text-gray-600 mb-2">Blank squares (showing zero) cannot be claimed by rolling.</p>
-                            <p className="text-gray-600">If you already have one of your tiles on <strong>both sides</strong> of a blank square (horizontally, vertically or diagonally), you automatically claim that blank square as a bonus wild tile.</p>
-                        </section>
-                    </div>
-
-                    <button onClick={() => setGamePhase('setup')} className="mt-6 w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] font-black text-lg py-4 rounded-full shadow-[0_6px_0_#c27a00] active:shadow-[0_0px_0_#c27a00] active:translate-y-[6px] transition-all flex-shrink-0">
-                        GOT IT
-                    </button>
+    /* ==========================================================================
+       RENDER: SETUP VIEW
+    ========================================================================== */
+    const renderSetup = () => (
+        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+            <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
+                <div className="flex justify-center mb-8">
+                    <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-48 h-auto drop-shadow-md" />
                 </div>
-            </div>
-        );
-    }
-
-    // SETUP VIEW
-    if (gamePhase === 'setup') {
-        return (
-            <div className="min-h-screen bg-app-gradient flex items-center justify-center p-4 font-sans text-gray-800 relative overflow-hidden">
-                <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
-                    <div className="flex justify-center mb-8">
-                        <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-48 h-auto drop-shadow-md" />
-                    </div>
-                    
-                    <div className="space-y-6 mb-8 text-left">
-                        <div>
-                            <label className="text-sm font-bold text-gray-500 uppercase tracking-wide ml-2 mb-1 block">Player 1</label>
-                            <div className="relative">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#ed404c] shadow-inner"></div>
-                                <input type="text" value={players.p1.name} onChange={e => setPlayers({...players, p1: {...players.p1, name: e.target.value}})} className="w-full bg-gray-100/50 text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent focus:bg-white transition-all font-medium" maxLength={12} />
-                            </div>
-                        </div>
-
-                        <div className="border-t border-gray-200 pt-6">
-                            <div className="flex items-center justify-between mb-3 px-2">
-                                <label className="text-sm font-bold text-gray-500 uppercase tracking-wide">Player 2</label>
-                                <div className="flex bg-gray-100 p-1 rounded-xl">
-                                    <button 
-                                        onClick={() => setPlayers({...players, p2: {...players.p2, isBot: false, name: 'Player 2'}})} 
-                                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${!players.p2.isBot ? 'bg-white shadow-sm text-[#298de6]' : 'text-gray-400'}`}
-                                    >
-                                        Human
-                                    </button>
-                                    <button 
-                                        onClick={() => setPlayers({...players, p2: {...players.p2, isBot: true, name: 'Rolly'}})} 
-                                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${players.p2.isBot ? 'bg-white shadow-sm text-[#298de6]' : 'text-gray-400'}`}
-                                    >
-                                        Computer
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="relative">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#298de6] shadow-inner"></div>
-                                <input type="text" value={players.p2.name} disabled={players.p2.isBot} onChange={e => setPlayers({...players, p2: {...players.p2, name: e.target.value}})} className={`w-full text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent transition-all font-medium ${players.p2.isBot ? 'bg-gray-200/50 text-gray-500 cursor-not-allowed' : 'bg-gray-100/50 focus:bg-white'}`} maxLength={12} />
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                        <button onClick={() => startGame(false)} className="w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] font-black text-xl py-4 rounded-full shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px] transition-all">
-                            PLAY
-                        </button>
-                        <button onClick={() => setGamePhase('instructions')} className="w-full bg-gray-100/50 hover:bg-gray-200/80 text-[#4a8f9c] font-bold text-lg py-3 rounded-full shadow-[0_4px_0_rgba(74,143,156,0.15)] active:shadow-[0_0px_0_rgba(74,143,156,0.15)] active:translate-y-[4px] transition-all border border-black/5">
-                            HOW TO PLAY
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    const panelOuterShadowClass = currentPlayer === 'p1'
-        ? 'shadow-[0_8px_20px_rgba(214,40,40,0.4)]'
-        : 'shadow-[0_8px_20px_rgba(26,124,216,0.4)]';
-
-    const isBotTurn = currentPlayer === 'p2' && players.p2.isBot;
-    const isRollDisabled = gamePhase !== 'playing' || diceRolling || currentRoll !== null || isBotTurn;
-
-    let actionText = 'ROLL DICE';
-    if (diceRolling) actionText = 'ROLLING...';
-    else if (currentRoll !== null && isBotTurn) actionText = 'PLACING...';
-    else if (currentRoll !== null) actionText = 'PLACE TILE';
-    else if (isBotTurn) actionText = 'THINKING...';
-
-    let winnerBgClass = "bg-white border-gray-300";
-    let winnerTextClass = "text-gray-700";
-    let winnerFireworkColour = "mixed";
-
-    if (winner === 'p1') {
-        winnerBgClass = "bg-gradient-to-br from-[#ffeaea] to-[#fdb6b6] border-[#ed404c]";
-        winnerTextClass = "text-[#d62828]";
-        winnerFireworkColour = "red";
-    } else if (winner === 'p2') {
-        winnerBgClass = "bg-gradient-to-br from-[#eaf4ff] to-[#b6dafd] border-[#298de6]";
-        winnerTextClass = "text-[#0a5699]";
-        winnerFireworkColour = "blue";
-    }
-
-    // PLAYING VIEW
-    return (
-        <div className="min-h-screen bg-black flex items-center justify-center sm:p-4">
-            
-            {/* MOBILE CONTAINER */}
-            <div className="w-full h-full sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] bg-app-gradient overflow-hidden relative flex flex-col shadow-2xl sm:ring-8 sm:ring-white/20">
                 
-                {/* HEADER */}
-                <div className="px-5 pt-6 pb-4 flex justify-between items-center z-10 relative">
-                    <button onClick={() => setGamePhase('setup')} className="w-12 h-12 bg-white/40 hover:bg-white/60 rounded-[14px] flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors text-[#5a9a9c]">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <div className="space-y-6 mb-8 text-left">
+                    <div>
+                        <label className="text-sm font-bold text-gray-500 uppercase tracking-wide ml-2 mb-1 block">Player 1</label>
+                        <div className="relative">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#ed404c] shadow-inner"></div>
+                            <input type="text" value={players.p1.name} onChange={e => setPlayers({...players, p1: {...players.p1, name: e.target.value}})} className="w-full bg-gray-100/50 text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent focus:bg-white transition-all font-medium" maxLength={12} />
+                        </div>
+                    </div>
+
+                    <div className="border-t border-gray-200 pt-6">
+                        <div className="flex items-center justify-between mb-3 px-2">
+                            <label className="text-sm font-bold text-gray-500 uppercase tracking-wide">Player 2</label>
+                            <div className="flex bg-gray-100 p-1 rounded-xl">
+                                <button onClick={() => setPlayers({...players, p2: {...players.p2, isBot: false, name: 'Player 2'}})} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${!players.p2.isBot ? 'bg-white shadow-sm text-[#298de6]' : 'text-gray-400'}`}>Human</button>
+                                <button onClick={() => setPlayers({...players, p2: {...players.p2, isBot: true, name: 'Rolly'}})} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${players.p2.isBot ? 'bg-white shadow-sm text-[#298de6]' : 'text-gray-400'}`}>Computer</button>
+                            </div>
+                        </div>
+                        <div className="relative">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#298de6] shadow-inner"></div>
+                            <input type="text" value={players.p2.name} disabled={players.p2.isBot} onChange={e => setPlayers({...players, p2: {...players.p2, name: e.target.value}})} className={`w-full text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent transition-all font-medium ${players.p2.isBot ? 'bg-gray-200/50 text-gray-500 cursor-not-allowed' : 'bg-gray-100/50 focus:bg-white'}`} maxLength={12} />
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="space-y-3">
+                    <button onClick={() => startGame(false)} className="w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] font-black text-xl py-4 rounded-full shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px] transition-all">
+                        PLAY
                     </button>
-                    
-                    <div className="flex items-center justify-center flex-1 px-3">
-                        <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-60 h-auto drop-shadow-md" />
-                    </div>
-                    
-                    <div className="bg-[#6b9ca3]/80 backdrop-blur-md px-3 py-2 rounded-full flex gap-3 items-center shadow-inner border border-white/20">
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-3.5 h-3.5 rounded-full bg-[#ed404c] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
-                            <span className="text-white font-bold text-base">{scores.p1}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-3.5 h-3.5 rounded-full bg-[#298de6] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
-                            <span className="text-white font-bold text-base">{scores.p2}</span>
-                        </div>
-                    </div>
+                    <button onClick={() => setGamePhase('instructions')} className="w-full bg-gray-100/50 hover:bg-gray-200/80 text-[#4a8f9c] font-bold text-lg py-3 rounded-full shadow-[0_4px_0_rgba(74,143,156,0.15)] active:shadow-[0_0px_0_rgba(74,143,156,0.15)] active:translate-y-[4px] transition-all border border-black/5">
+                        HOW TO PLAY
+                    </button>
                 </div>
-
-                {/* BOARD AREA */}
-                <div className="flex-1 px-4 sm:px-6 flex items-center justify-center z-10 relative">
-                    <div className="w-full aspect-square max-w-[380px] shadow-board bg-[#d19e71] rounded-[16px] p-[6px] sm:p-2 relative mx-auto">
-                        <div className="absolute inset-1 rounded-[12px] bg-[#bf8656] shadow-[inset_0_5px_15px_rgba(0,0,0,0.3)] border border-[#a6714a] pointer-events-none"></div>
-                        
-                        <div className="relative z-10 w-full h-full grid grid-rows-6 gap-[4px] sm:gap-[6px] p-1">
-                            {[0, 1, 2, 3, 4, 5].map(r => (
-                                <div key={r} className="grid grid-cols-3 gap-[4px] sm:gap-[6px] w-full h-full">
-                                    {[0, 1, 2].map(d => {
-                                        const c1 = board[r * 6 + d * 2];
-                                        const c2 = board[r * 6 + d * 2 + 1];
-                                        const isValid1 = gamePhase === 'playing' && !diceRolling && currentRoll !== null && c1.value === currentRoll && c1.owner === null;
-                                        const isValid2 = gamePhase === 'playing' && !diceRolling && currentRoll !== null && c2.value === currentRoll && c2.owner === null;
-                                        
-                                        return (
-                                            <div key={d} className="flex bg-[#fbe6d3] rounded-[8px] sm:rounded-[10px] shadow-[0_3px_5px_rgba(0,0,0,0.15)] border-b-[3px] border-[#d4bca4] overflow-hidden">
-                                                <Cell cell={c1} onClick={() => !isBotTurn && handleCellClick(c1.id)} isValid={isValid1} isLeft={true} />
-                                                <Cell cell={c2} onClick={() => !isBotTurn && handleCellClick(c2.id)} isValid={isValid2} isLeft={false} />
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* BOTTOM CONTROL PANEL */}
-                <div className="mt-auto px-4 pb-6 pt-2 z-10 relative">
-                    <div className={`rounded-[24px] relative flex flex-col items-center p-5 transition-shadow duration-700 ${panelOuterShadowClass}`}>
-                        
-                        {/* Base Red Layer (Always visible underneath) */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-[#f95757] to-[#d62828] border-[4px] border-[#a81a1a] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden" />
-
-                        {/* Blue Expanding Layer (Wipes over the red layer using clip-path) */}
-                        <div 
-                            className="absolute inset-0 bg-gradient-to-b from-[#4bb0ff] to-[#1a7cd8] border-[4px] border-[#0e5091] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden transition-all duration-700 ease-in-out z-0"
-                            style={{ clipPath: currentPlayer === 'p2' ? 'circle(150% at 50% 50%)' : 'circle(0% at 50% 50%)' }}
-                        />
-
-                        {/* Content Area */}
-                        <div className="relative z-10 w-full flex flex-col items-center">
-                            <div className="text-white font-bold text-xl mb-4 drop-shadow-md">
-                                {notification ? notification : `${players[currentPlayer].name}'s Turn`}
-                            </div>
-                            
-                            <div className="flex w-full items-center justify-between gap-4 min-h-[70px]">
-                                <Dice rolling={diceRolling} value={diceTarget} />
-                                
-                                {isRollDisabled ? (
-                                    <div className="flex-1 flex items-center justify-center">
-                                        <span className="text-white font-black text-2xl animate-pulse tracking-widest drop-shadow-lg">
-                                            {actionText}
-                                        </span>
-                                    </div>
-                                ) : (
-                                    <button 
-                                        onClick={handleRoll}
-                                        className="flex-1 py-4 rounded-full font-black text-xl transition-all bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px]"
-                                    >
-                                        {actionText}
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* GAME OVER OVERLAY */}
-                {gamePhase === 'gameOver' && (
-                    <div className="absolute inset-0 z-50 overflow-hidden flex items-center justify-center">
-                        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-0"></div>
-                        <Fireworks winnerColour={winnerFireworkColour} />
-                        
-                        <div className={`relative z-10 rounded-[32px] p-8 text-center shadow-[0_0_50px_rgba(0,0,0,0.6)] max-w-sm w-[90%] transform scale-100 animate-in zoom-in-95 border-4 ${winnerBgClass}`}>
-                            <h2 className={`text-3xl font-black mb-6 uppercase ${winnerTextClass}`}>
-                                {winner === 'draw' ? 'Match Drawn!' : `${players[winner].name} Wins!`}
-                            </h2>
-                            
-                            <div className="space-y-4">
-                                <button onClick={() => startGame(true)} className="w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] font-black text-lg py-4 rounded-full shadow-[0_6px_0_#c27a00] active:shadow-[0_0px_0_#c27a00] active:translate-y-[6px] transition-all">
-                                    PLAY ROUND {roundNumber + 1}
-                                </button>
-                                <button onClick={() => setGamePhase('setup')} className="w-full bg-gray-100/50 hover:bg-gray-200/80 text-gray-800 font-bold text-lg py-4 rounded-full shadow-[0_6px_0_rgba(0,0,0,0.1)] active:shadow-[0_0px_0_rgba(0,0,0,0.1)] active:translate-y-[6px] transition-all backdrop-blur-sm border border-black/10">
-                                    MAIN MENU
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
+    );
+
+    /* ==========================================================================
+       RENDER: INSTRUCTIONS VIEW
+    ========================================================================== */
+    const renderInstructions = () => (
+        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+            <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-[32px] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col relative z-10">
+                <h2 className="text-3xl font-extrabold text-[#4a8f9c] mb-6 text-center tracking-wide">HOW TO PLAY</h2>
+
+                <div className="flex-1 overflow-y-auto pr-3 space-y-6 text-left text-sm sm:text-base instructions-scroll">
+                    <section>
+                        <h3 className="font-bold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                            <span className="bg-[#4a8f9c] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> Objective
+                        </h3>
+                        <p className="text-gray-600">Be the first player to make a continuous line of 4 tiles in a row (horizontally, vertically or diagonally).</p>
+                    </section>
+                    <section>
+                        <h3 className="font-bold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                            <span className="bg-[#4a8f9c] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span> Setup
+                        </h3>
+                        <p className="text-gray-600">The dominoes are randomly arranged into a 6x6 grid. Each player is assigned a set of coloured tiles.</p>
+                    </section>
+                    <section>
+                        <h3 className="font-bold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                            <span className="bg-[#4a8f9c] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span> Game Flow
+                        </h3>
+                        <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                            <li>Players take turns rolling the die.</li>
+                            <li>Cover one square showing the matching number with one of your coloured tiles.</li>
+                            <li>If you roll a number that no longer appears on the board, you forfeit that roll and your turn ends.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3 className="font-bold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                            <span className="bg-[#4a8f9c] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span> Bonus Wild Tiles
+                        </h3>
+                        <p className="text-gray-600 mb-2">Blank squares (showing zero) cannot be claimed by rolling.</p>
+                        <p className="text-gray-600">If you already have one of your tiles on <strong>both sides</strong> of a blank square (horizontally, vertically or diagonally), you automatically claim that blank square as a bonus wild tile.</p>
+                    </section>
+                </div>
+
+                <button onClick={() => setGamePhase('setup')} className="mt-6 w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] font-black text-lg py-4 rounded-full shadow-[0_6px_0_#c27a00] active:shadow-[0_0px_0_#c27a00] active:translate-y-[6px] transition-all flex-shrink-0">
+                    GOT IT
+                </button>
+            </div>
+        </div>
+    );
+
+    /* ==========================================================================
+       RENDER: PLAYING / GAMEOVER VIEW
+    ========================================================================== */
+    const renderPlaying = () => {
+        const isBotTurn = currentPlayer === 'p2' && players.p2.isBot;
+        const isRollDisabled = gamePhase !== 'playing' || diceRolling || currentRoll !== null || isBotTurn;
+
+        let actionText = 'ROLL DICE';
+        if (diceRolling) actionText = 'ROLLING...';
+        else if (currentRoll !== null && isBotTurn) actionText = 'PLACING...';
+        else if (currentRoll !== null) actionText = 'PLACE TILE';
+        else if (isBotTurn) actionText = 'THINKING...';
+
+        const panelOuterShadowClass = currentPlayer === 'p1'
+            ? 'shadow-[0_8px_20px_rgba(214,40,40,0.4)]'
+            : 'shadow-[0_8px_20px_rgba(26,124,216,0.4)]';
+
+        let winnerBgClass = "bg-white border-gray-300";
+        let winnerTextClass = "text-gray-700";
+        let winnerFireworkColour = "mixed";
+
+        if (winner === 'p1') {
+            winnerBgClass = "bg-gradient-to-br from-[#ffeaea] to-[#fdb6b6] border-[#ed404c]";
+            winnerTextClass = "text-[#d62828]";
+            winnerFireworkColour = "red";
+        } else if (winner === 'p2') {
+            winnerBgClass = "bg-gradient-to-br from-[#eaf4ff] to-[#b6dafd] border-[#298de6]";
+            winnerTextClass = "text-[#0a5699]";
+            winnerFireworkColour = "blue";
+        }
+
+        return (
+            <div className="min-h-screen flex items-center justify-center sm:p-4">
+                {/* 
+                  The background is completely removed here so the container acts purely as a wrapper.
+                  It will effortlessly inherit the continuous aqua gradient set on the <body> tag in HTML.
+                */}
+                <div className="w-full h-full sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
+                    
+                    {/* HEADER */}
+                    <div className="px-5 pt-6 pb-4 flex justify-between items-center z-10 relative">
+                        <button onClick={() => setGamePhase('setup')} className="w-12 h-12 bg-white/40 hover:bg-white/60 rounded-[14px] flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors text-[#5a9a9c]">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                        
+                        <div className="flex items-center justify-center flex-1 px-3">
+                            <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-60 h-auto drop-shadow-md" />
+                        </div>
+                        
+                        <div className="bg-[#6b9ca3]/80 backdrop-blur-md px-3 py-2 rounded-full flex gap-3 items-center shadow-inner border border-white/20">
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-3.5 h-3.5 rounded-full bg-[#ed404c] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
+                                <span className="text-white font-bold text-base">{scores.p1}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-3.5 h-3.5 rounded-full bg-[#298de6] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]"></div>
+                                <span className="text-white font-bold text-base">{scores.p2}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* BOARD AREA */}
+                    <div className="flex-1 px-4 sm:px-6 flex items-center justify-center z-10 relative">
+                        <div className="w-full aspect-square max-w-[380px] shadow-board bg-[#d19e71] rounded-[16px] p-[6px] sm:p-2 relative mx-auto">
+                            <div className="absolute inset-1 rounded-[12px] bg-[#bf8656] shadow-[inset_0_5px_15px_rgba(0,0,0,0.3)] border border-[#a6714a] pointer-events-none"></div>
+                            
+                            <div className="relative z-10 w-full h-full grid grid-rows-6 gap-[4px] sm:gap-[6px] p-1">
+                                {[0, 1, 2, 3, 4, 5].map(r => (
+                                    <div key={r} className="grid grid-cols-3 gap-[4px] sm:gap-[6px] w-full h-full">
+                                        {[0, 1, 2].map(d => {
+                                            const c1 = board[r * 6 + d * 2];
+                                            const c2 = board[r * 6 + d * 2 + 1];
+                                            const isValid1 = gamePhase === 'playing' && !diceRolling && currentRoll !== null && c1.value === currentRoll && c1.owner === null;
+                                            const isValid2 = gamePhase === 'playing' && !diceRolling && currentRoll !== null && c2.value === currentRoll && c2.owner === null;
+                                            
+                                            return (
+                                                <div key={d} className="flex bg-[#fbe6d3] rounded-[8px] sm:rounded-[10px] shadow-[0_3px_5px_rgba(0,0,0,0.15)] border-b-[3px] border-[#d4bca4] overflow-hidden">
+                                                    <Cell cell={c1} onClick={() => !isBotTurn && handleCellClick(c1.id)} isValid={isValid1} isLeft={true} />
+                                                    <Cell cell={c2} onClick={() => !isBotTurn && handleCellClick(c2.id)} isValid={isValid2} isLeft={false} />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* BOTTOM CONTROL PANEL */}
+                    <div className="mt-auto px-4 pb-6 pt-2 z-10 relative">
+                        <div className={`rounded-[24px] relative flex flex-col items-center p-5 transition-shadow duration-700 ${panelOuterShadowClass}`}>
+                            <div className="absolute inset-0 bg-gradient-to-b from-[#f95757] to-[#d62828] border-[4px] border-[#a81a1a] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden" />
+
+                            <div 
+                                className="absolute inset-0 bg-gradient-to-b from-[#4bb0ff] to-[#1a7cd8] border-[4px] border-[#0e5091] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden transition-all duration-700 ease-in-out z-0"
+                                style={{ clipPath: currentPlayer === 'p2' ? 'circle(150% at 50% 50%)' : 'circle(0% at 50% 50%)' }}
+                            />
+
+                            <div className="relative z-10 w-full flex flex-col items-center">
+                                <div className="text-white font-bold text-xl mb-4 drop-shadow-md">
+                                    {notification ? notification : `${players[currentPlayer].name}'s Turn`}
+                                </div>
+                                
+                                <div className="flex w-full items-center justify-between gap-4 min-h-[70px]">
+                                    <Dice rolling={diceRolling} value={diceTarget} />
+                                    
+                                    {isRollDisabled ? (
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <span className="text-white font-black text-2xl animate-pulse tracking-widest drop-shadow-lg">
+                                                {actionText}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <button 
+                                            onClick={handleRoll}
+                                            className="flex-1 py-4 rounded-full font-black text-xl transition-all bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px]"
+                                        >
+                                            {actionText}
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* GAME OVER OVERLAY */}
+                    {gamePhase === 'gameOver' && (
+                        <div className="absolute inset-0 z-50 overflow-hidden flex items-center justify-center">
+                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-0"></div>
+                            <Fireworks winnerColour={winnerFireworkColour} />
+                            
+                            <div className={`relative z-10 rounded-[32px] p-8 text-center shadow-[0_0_50px_rgba(0,0,0,0.6)] max-w-sm w-[90%] transform scale-100 animate-in zoom-in-95 border-4 ${winnerBgClass}`}>
+                                <h2 className={`text-3xl font-black mb-6 uppercase ${winnerTextClass}`}>
+                                    {winner === 'draw' ? 'Match Drawn!' : `${players[winner].name} Wins!`}
+                                </h2>
+                                
+                                <div className="space-y-4">
+                                    <button onClick={() => startGame(true)} className="w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] font-black text-lg py-4 rounded-full shadow-[0_6px_0_#c27a00] active:shadow-[0_0px_0_#c27a00] active:translate-y-[6px] transition-all">
+                                        PLAY ROUND {roundNumber + 1}
+                                    </button>
+                                    <button onClick={() => setGamePhase('setup')} className="w-full bg-gray-100/50 hover:bg-gray-200/80 text-gray-800 font-bold text-lg py-4 rounded-full shadow-[0_6px_0_rgba(0,0,0,0.1)] active:shadow-[0_0px_0_rgba(0,0,0,0.1)] active:translate-y-[6px] transition-all backdrop-blur-sm border border-black/10">
+                                        MAIN MENU
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    return (
+        <React.Fragment>
+            {gamePhase === 'setup' && renderSetup()}
+            {gamePhase === 'instructions' && renderInstructions()}
+            {(gamePhase === 'playing' || gamePhase === 'gameOver') && renderPlaying()}
+        </React.Fragment>
     );
 }
 
