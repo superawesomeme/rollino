@@ -6,7 +6,7 @@ Players take turns rolling a die and placing one of their coloured counters on a
 
 Because the board is made from randomly arranged dominoes, every game starts with a different layout.
 
-## The Story Behind Rollino
+## The story behind Rollino
 
 Rollino was created by father and son **Richard and Shaun Daubney**.
 
@@ -15,8 +15,6 @@ Richard originally came up with the concept of a tic-tac-toe-style game using a 
 Shaun suggested replacing the fixed grid with **dominoes**, allowing the layout of the board to change every round. He also introduced the idea of **wild squares**, adding another strategic element to the game.
 
 Together, they developed the idea into a physical wooden prototype before creating this digital version.
-
-### From Wood to Web
 
 The original handmade wooden prototype can be seen here:
 
