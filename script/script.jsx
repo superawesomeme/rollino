@@ -12,19 +12,16 @@ const DICE_ROTATIONS = {
 
 const generateGame = () => {
     let all = [];
-    // Generate all dominoes EXCEPT doubles
     for (let i = 0; i <= 6; i++) {
-        for (let j = i + 1; j <= 6; j++) { // 'j = i + 1' prevents 0-0, 1-1, 2-2 etc.
+        for (let j = i + 1; j <= 6; j++) {
             all.push([i, j]);
         }
     }
-    // Shuffle the 21 unique non-double dominoes
     for (let i = all.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [all[i], all[j]] = [all[j], all[i]];
     }
     
-    // Pick the first 18 for our board
     let selected = all.slice(0, 18);
     let newBoard = [];
     
@@ -32,7 +29,6 @@ const generateGame = () => {
         for (let d = 0; d < 3; d++) {
             let domIndex = r * 3 + d;
             let domino = selected[domIndex];
-            // Randomly flip the orientation of the domino half the time
             if (Math.random() > 0.5) domino = [domino[1], domino[0]];
             
             newBoard.push({ id: r * 6 + d * 2, value: domino[0], owner: null });
@@ -584,7 +580,7 @@ function App() {
 
     // PLAYING VIEW
     return (
-        <div className="min-h-screen bg-black flex items-center justify-center sm:p-4">
+        <div className="min-h-screen bg-app-gradient flex items-center justify-center sm:p-4 font-sans text-gray-800">
             
             {/* MOBILE CONTAINER */}
             <div className="w-full h-full sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] bg-app-gradient overflow-hidden relative flex flex-col shadow-2xl sm:ring-8 sm:ring-white/20">
