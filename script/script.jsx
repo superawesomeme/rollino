@@ -546,9 +546,9 @@ function App() {
         );
     }
 
-    const panelColourClass = currentPlayer === 'p1' 
-        ? 'bg-gradient-to-b from-[#f95757] to-[#d62828] border-[#a81a1a]' 
-        : 'bg-gradient-to-b from-[#4bb0ff] to-[#1a7cd8] border-[#0e5091]';
+    const panelOuterShadowClass = currentPlayer === 'p1'
+        ? 'shadow-[0_8px_20px_rgba(214,40,40,0.4)]'
+        : 'shadow-[0_8px_20px_rgba(26,124,216,0.4)]';
 
     const isBotTurn = currentPlayer === 'p2' && players.p2.isBot;
     const isRollDisabled = gamePhase !== 'playing' || diceRolling || currentRoll !== null || isBotTurn;
@@ -558,11 +558,6 @@ function App() {
     else if (currentRoll !== null && isBotTurn) actionText = 'PLACING...';
     else if (currentRoll !== null) actionText = 'PLACE TILE';
     else if (isBotTurn) actionText = 'THINKING...';
-
-    // Set outer shadow smoothly crossfading based on current player
-    const panelOuterShadowClass = currentPlayer === 'p1'
-        ? 'shadow-[0_8px_20px_rgba(214,40,40,0.4)]'
-        : 'shadow-[0_8px_20px_rgba(26,124,216,0.4)]';
 
     let winnerBgClass = "bg-white border-gray-300";
     let winnerTextClass = "text-gray-700";
@@ -580,7 +575,7 @@ function App() {
 
     // PLAYING VIEW
     return (
-        <div className="min-h-screen bg-app-gradient flex items-center justify-center sm:p-4 font-sans text-gray-800">
+        <div className="min-h-screen bg-black flex items-center justify-center sm:p-4">
             
             {/* MOBILE CONTAINER */}
             <div className="w-full h-full sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] bg-app-gradient overflow-hidden relative flex flex-col shadow-2xl sm:ring-8 sm:ring-white/20">
