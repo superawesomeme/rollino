@@ -18,8 +18,10 @@
     <!-- Babel (Allows the browser to read JSX syntax directly) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body class="bg-[#92d9df] m-0 p-0 overflow-hidden">
-    <!-- This is where React will inject the game -->
+<!-- The continuous aqua background is now safely anchored to the body -->
+<body class="bg-app-gradient m-0 p-0 overflow-x-hidden text-gray-800 font-sans">
+    
+    <!-- React Injection Point -->
     <div id="root"></div>
 
     <!-- Main Application Logic -->
