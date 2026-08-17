@@ -193,13 +193,13 @@ const Token = ({ color, animate }) => (
         alt=""
         aria-hidden="true"
         className={`counter-art absolute inset-0 m-auto w-[82%] aspect-square transform transition-all duration-300 z-20
-            ${animate ? 'scale-100 opacity-100 -translate-y-[2px]' : 'scale-50 opacity-0 translate-y-0'}
+            ${animate ? 'scale-100 opacity-100 translate-y-[2px]' : 'scale-50 opacity-0 translate-y-0'}
         `}
     />
 );
 
 const Cell = ({ cell, onClick, isValid, isLeft }) => (
-    <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'border-r-2 border-[#d4bca4]' : ''}`}>
+    <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'domino-half-left' : ''}`}>
         <PipLayout val={cell.value} recessed={true} />
         {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} animate={true} />}
         {isValid && (
