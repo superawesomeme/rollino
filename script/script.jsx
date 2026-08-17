@@ -188,18 +188,20 @@ const PipLayout = ({ val, recessed = false }) => {
 };
 
 const Token = ({ color, animate }) => (
-    <img
-        src={`images/counter-${color}.png`}
-        alt=""
-        aria-hidden="true"
-        className={`counter-art absolute inset-0 m-auto w-[82%] aspect-square transform transition-all duration-300 z-20
-            ${animate ? 'scale-100 opacity-100 translate-y-[1px]' : 'scale-50 opacity-0 translate-y-0'}
-        `}
-    />
+    <div className="board-counter-position absolute z-20">
+        <img
+            src={`images/counter-${color}.png`}
+            alt=""
+            aria-hidden="true"
+            className={`counter-art board-counter-art w-full h-full transform transition-all duration-300
+                ${animate ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}
+            `}
+        />
+    </div>
 );
 
 const Cell = ({ cell, onClick, isValid, isLeft }) => (
-    <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'domino-half-left' : ''}`}>
+    <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'domino-cell-left' : ''}`}>
         <PipLayout val={cell.value} recessed={true} />
         {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} animate={true} />}
         {isValid && (
@@ -547,11 +549,11 @@ function App() {
         }
 
         return (
-            <div className="min-h-screen flex items-start sm:items-center justify-center sm:p-4">
-                <div className="w-full min-h-screen sm:min-h-0 sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
+            <div className="playing-viewport min-h-screen flex items-start sm:items-center justify-center sm:p-4">
+                <div className="playing-shell w-full min-h-screen sm:min-h-0 sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
                     
                     {/* HEADER */}
-                    <div className="px-5 pt-8 sm:pt-6 pb-4 flex justify-between items-center z-10 relative">
+                    <div className="playing-header px-5 pt-8 sm:pt-6 pb-4 flex justify-between items-center z-10 relative">
                         <button onClick={() => setGamePhase('setup')} className="w-12 h-12 bg-white/40 hover:bg-white/60 rounded-[14px] flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors text-[#5a9a9c]">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
@@ -573,7 +575,7 @@ function App() {
                     </div>
 
                     {/* BOARD AREA */}
-                    <div className="flex-1 px-4 sm:px-6 flex items-center justify-center z-10 relative">
+                    <div className="playing-board-area flex-none sm:flex-1 px-4 sm:px-6 flex items-center justify-center z-10 relative">
                         <div className="game-board-art w-full aspect-square max-w-[380px] relative mx-auto">
                             <div className="relative z-10 w-full h-full grid grid-rows-6 gap-[4px] sm:gap-[6px]">
                                 {[0, 1, 2, 3, 4, 5].map(r => (
@@ -598,11 +600,11 @@ function App() {
                     </div>
 
                     {/* BOTTOM CONTROL PANEL */}
-                    <div className="mt-auto px-4 pb-8 sm:pb-6 pt-2 z-10 relative">
+                    <div className="playing-controls-area mt-3 sm:mt-auto px-4 pb-6 sm:pb-5 pt-0 sm:pt-1 z-10 relative">
                         <div className={`rounded-[24px] relative flex flex-col items-center p-5 transition-shadow duration-700 ${panelOuterShadowClass}`}>
                             <div className="absolute inset-0 bg-gradient-to-b from-[#f95757] to-[#d62828] border-[4px] border-[#a81a1a] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden" />
 
-                            <div 
+                            <div
                                 className="absolute inset-0 bg-gradient-to-b from-[#4bb0ff] to-[#1a7cd8] border-[4px] border-[#0e5091] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden transition-all duration-700 ease-in-out z-0"
                                 style={{ clipPath: currentPlayer === 'p2' ? 'circle(150% at 50% 50%)' : 'circle(0% at 50% 50%)' }}
                             />
@@ -665,11 +667,4 @@ function App() {
         <React.Fragment>
             {gamePhase === 'setup' && renderSetup()}
             {gamePhase === 'instructions' && renderInstructions()}
-            {(gamePhase === 'playing' || gamePhase === 'gameOver') && renderPlaying()}
-        </React.Fragment>
-    );
-}
-
-// Render the application to the DOM
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+            {(gamePhase === 'playing' || gamePhase === 'gameOver') && renderPlaying
