@@ -1,10 +1,14 @@
 /* =========================================
    1. GLOBAL BACKGROUNDS & GRADIENTS
 ========================================= */
+body,
 .bg-app-gradient {
   background-color: #92d9df;
-  background-image: radial-gradient(circle at 50% 0%, #bdecf0 0%, transparent 70%),
-                    radial-gradient(circle at 50% 100%, #68b9c2 0%, transparent 70%);
+  background-image: url('../images/rollino-background.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
 }
 
 .shadow-board {
