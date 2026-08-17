@@ -193,7 +193,7 @@ const Token = ({ color, animate }) => (
         alt=""
         aria-hidden="true"
         className={`counter-art absolute inset-0 m-auto w-[82%] aspect-square transform transition-all duration-300 z-20
-            ${animate ? 'scale-100 opacity-100 translate-y-[2px]' : 'scale-50 opacity-0 translate-y-0'}
+            ${animate ? 'scale-100 opacity-100 translate-y-[1px]' : 'scale-50 opacity-0 translate-y-0'}
         `}
     />
 );
