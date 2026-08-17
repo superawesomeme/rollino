@@ -12,38 +12,47 @@
 }
 
 /* =========================================
-   2. 3D TOKENS (Cartoony/Chunky look)
+   2. PNG GAME ART
 ========================================= */
-.token-3d-red {
-  background: linear-gradient(to bottom, #ff7b84, #e63946);
-  box-shadow: 
-    inset 0 2px 2px rgba(255, 255, 255, 0.4), 
-    0 1px 0 #bd1824,                          
-    0 2px 0 #bd1824,                          
-    0 3px 0 #bd1824,                          
-    0 4px 0 #bd1824,                          
-    0 8px 10px rgba(0, 0, 0, 0.2);            
+.game-board-art {
+  background-image: url('../images/wooden-board.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  /* Keep the domino grid inside the recessed centre of the artwork. */
+  padding: 7.4%;
+  filter: drop-shadow(0 12px 16px rgba(0,0,0,0.20));
 }
 
-.token-3d-blue {
-  background: linear-gradient(to bottom, #6ec0ff, #298de6);
-  box-shadow: 
-    inset 0 2px 2px rgba(255, 255, 255, 0.4), 
-    0 1px 0 #1562ad,                          
-    0 2px 0 #1562ad,                          
-    0 3px 0 #1562ad,                          
-    0 4px 0 #1562ad,                          
-    0 8px 10px rgba(0, 0, 0, 0.2);            
+.player-area-art {
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 1496 / 721;
+}
+
+.player-area-art > .player-area-skin {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 500ms ease;
+}
+
+.counter-art {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* =========================================
    3. 3D DICE & ANIMATIONS
 ========================================= */
 .dice-scene { 
-  --dice-size: 64px;
-  --dice-face-depth: 28px;
-  width: var(--dice-size); 
-  height: var(--dice-size); 
+  width: 64px; 
+  height: 64px; 
   perspective: 600px; 
 }
 
@@ -57,23 +66,20 @@
 
 .dice-face { 
   position: absolute; 
-  width: var(--dice-size); 
-  height: var(--dice-size); 
+  width: 64px; 
+  height: 64px; 
   background: #ffffff; 
   border-radius: 10px; 
   border: 1px solid #e0e0e0;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.05); 
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  overflow: hidden;
 }
 
-.dice-face-front  { transform: rotateY(0deg) translateZ(var(--dice-face-depth)); }
-.dice-face-back   { transform: rotateY(180deg) translateZ(var(--dice-face-depth)); }
-.dice-face-right  { transform: rotateY(90deg) translateZ(var(--dice-face-depth)); }
-.dice-face-left   { transform: rotateY(-90deg) translateZ(var(--dice-face-depth)); }
-.dice-face-top    { transform: rotateX(90deg) translateZ(var(--dice-face-depth)); }
-.dice-face-bottom { transform: rotateX(-90deg) translateZ(var(--dice-face-depth)); }
+.dice-face-front  { transform: rotateY(0deg) translateZ(32px); }
+.dice-face-back   { transform: rotateY(180deg) translateZ(32px); }
+.dice-face-right  { transform: rotateY(90deg) translateZ(32px); }
+.dice-face-left   { transform: rotateY(-90deg) translateZ(32px); }
+.dice-face-top    { transform: rotateX(90deg) translateZ(32px); }
+.dice-face-bottom { transform: rotateX(-90deg) translateZ(32px); }
 
 .dice-jumping {
   animation: dice-bounce 1.2s linear forwards;

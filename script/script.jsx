@@ -188,10 +188,14 @@ const PipLayout = ({ val }) => {
 };
 
 const Token = ({ color, animate }) => (
-    <div className={`absolute inset-0 m-auto w-[70%] aspect-square rounded-full transform transition-all duration-300 z-20 
-        ${animate ? 'scale-100 opacity-100 -translate-y-[2px]' : 'scale-50 opacity-0 translate-y-0'}
-        ${color === 'red' ? 'token-3d-red' : 'token-3d-blue'}
-    `}></div>
+    <img
+        src={`images/counter-${color}.png`}
+        alt=""
+        aria-hidden="true"
+        className={`counter-art absolute inset-0 m-auto w-[82%] aspect-square transform transition-all duration-300 z-20
+            ${animate ? 'scale-100 opacity-100 -translate-y-[2px]' : 'scale-50 opacity-0 translate-y-0'}
+        `}
+    />
 );
 
 const Cell = ({ cell, onClick, isValid, isLeft }) => (
@@ -364,6 +368,7 @@ function App() {
                         let score = 0;
                         const lines = [];
                         
+                        // Rows, Cols, Diagonals logic
                         for(let r = 0; r < 6; r++) for(let c = 0; c < 3; c++) lines.push([r*6+c, r*6+c+1, r*6+c+2, r*6+c+3]);
                         for(let c = 0; c < 6; c++) for(let r = 0; r < 3; r++) lines.push([(r)*6+c, (r+1)*6+c, (r+2)*6+c, (r+3)*6+c]);
                         for(let r = 0; r < 3; r++) for(let c = 0; c < 3; c++) lines.push([(r)*6+c, (r+1)*6+c+1, (r+2)*6+c+2, (r+3)*6+c+3]);
@@ -417,7 +422,7 @@ function App() {
        RENDER: SETUP VIEW
     ========================================================================== */
     const renderSetup = () => (
-        <div className="min-h-[100dvh] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
                 <div className="flex justify-center mb-8">
                     <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-48 h-auto drop-shadow-md" />
@@ -427,7 +432,7 @@ function App() {
                     <div>
                         <label className="text-sm font-bold text-gray-500 uppercase tracking-wide ml-2 mb-1 block">Player 1</label>
                         <div className="relative">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-b from-[#ff7b84] to-[#e63946] shadow-[0_2px_0_#bd1824,inset_0_1px_2px_rgba(255,255,255,0.4)]"></div>
+                            <img src="images/counter-red.png" alt="" aria-hidden="true" className="counter-art absolute left-3.5 top-1/2 -translate-y-1/2 w-6 h-6" />
                             <input type="text" value={players.p1.name} onChange={e => setPlayers({...players, p1: {...players.p1, name: e.target.value}})} className="w-full bg-gray-100/50 text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent focus:bg-white transition-all font-medium" maxLength={12} />
                         </div>
                     </div>
@@ -441,7 +446,7 @@ function App() {
                             </div>
                         </div>
                         <div className="relative">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-b from-[#6ec0ff] to-[#298de6] shadow-[0_2px_0_#1562ad,inset_0_1px_2px_rgba(255,255,255,0.4)]"></div>
+                            <img src="images/counter-blue.png" alt="" aria-hidden="true" className="counter-art absolute left-3.5 top-1/2 -translate-y-1/2 w-6 h-6" />
                             <input type="text" value={players.p2.name} disabled={players.p2.isBot} onChange={e => setPlayers({...players, p2: {...players.p2, name: e.target.value}})} className={`w-full text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent transition-all font-medium ${players.p2.isBot ? 'bg-gray-200/50 text-gray-500 cursor-not-allowed' : 'bg-gray-100/50 focus:bg-white'}`} maxLength={12} />
                         </div>
                     </div>
@@ -467,7 +472,7 @@ function App() {
        RENDER: INSTRUCTIONS VIEW
     ========================================================================== */
     const renderInstructions = () => (
-        <div className="min-h-[100dvh] flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
             <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-[32px] shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col relative z-10">
                 <h2 className="text-3xl font-extrabold text-[#4a8f9c] mb-6 text-center tracking-wide">HOW TO PLAY</h2>
 
@@ -542,15 +547,11 @@ function App() {
         }
 
         return (
-            <div className="min-h-[100dvh] flex items-start sm:items-center justify-center sm:p-4">
-                {/* 
-                  REMOVED min-h-screen here so the container on mobile only grows to exactly wrap 
-                  the header, board, and footer. This prevents elements stretching out of view!
-                */}
-                <div className="w-full sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
+            <div className="min-h-screen flex items-start sm:items-center justify-center sm:p-4">
+                <div className="w-full min-h-screen sm:min-h-0 sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
                     
                     {/* HEADER */}
-                    <div className="px-5 pt-10 sm:pt-6 pb-4 flex justify-between items-center z-10 relative">
+                    <div className="px-5 pt-8 sm:pt-6 pb-4 flex justify-between items-center z-10 relative">
                         <button onClick={() => setGamePhase('setup')} className="w-12 h-12 bg-white/40 hover:bg-white/60 rounded-[14px] flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors text-[#5a9a9c]">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
@@ -561,22 +562,20 @@ function App() {
                         
                         <div className="bg-[#6b9ca3]/80 backdrop-blur-md px-3 py-2 rounded-full flex gap-3 items-center shadow-inner border border-white/20">
                             <div className="flex items-center gap-1.5">
-                                <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-b from-[#ff7b84] to-[#e63946] shadow-[0_2px_0_#bd1824,inset_0_1px_2px_rgba(255,255,255,0.4)]"></div>
+                                <img src="images/counter-red.png" alt="Red score" className="counter-art w-5 h-5" />
                                 <span className="text-white font-bold text-base">{scores.p1}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
-                                <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-b from-[#6ec0ff] to-[#298de6] shadow-[0_2px_0_#1562ad,inset_0_1px_2px_rgba(255,255,255,0.4)]"></div>
+                                <img src="images/counter-blue.png" alt="Blue score" className="counter-art w-5 h-5" />
                                 <span className="text-white font-bold text-base">{scores.p2}</span>
                             </div>
                         </div>
                     </div>
 
                     {/* BOARD AREA */}
-                    <div className="px-4 sm:px-6 py-4 flex-1 flex items-center justify-center z-10 relative">
-                        <div className="w-full aspect-square max-w-[380px] shadow-board bg-[#d19e71] rounded-[16px] p-[6px] sm:p-2 relative mx-auto">
-                            <div className="absolute inset-1 rounded-[12px] bg-[#bf8656] shadow-[inset_0_5px_15px_rgba(0,0,0,0.3)] border border-[#a6714a] pointer-events-none"></div>
-                            
-                            <div className="relative z-10 w-full h-full grid grid-rows-6 gap-[4px] sm:gap-[6px] p-1">
+                    <div className="flex-1 px-4 sm:px-6 flex items-center justify-center z-10 relative">
+                        <div className="game-board-art w-full aspect-square max-w-[380px] relative mx-auto">
+                            <div className="relative z-10 w-full h-full grid grid-rows-6 gap-[4px] sm:gap-[6px]">
                                 {[0, 1, 2, 3, 4, 5].map(r => (
                                     <div key={r} className="grid grid-cols-3 gap-[4px] sm:gap-[6px] w-full h-full">
                                         {[0, 1, 2].map(d => {
@@ -599,21 +598,27 @@ function App() {
                     </div>
 
                     {/* BOTTOM CONTROL PANEL */}
-                    <div className="px-4 pb-10 sm:pb-6 pt-2 z-10 relative mt-auto">
-                        <div className={`rounded-[24px] relative flex flex-col items-center p-5 transition-shadow duration-700 ${panelOuterShadowClass}`}>
-                            <div className="absolute inset-0 bg-gradient-to-b from-[#f95757] to-[#d62828] border-[4px] border-[#a81a1a] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden" />
-
-                            <div 
-                                className="absolute inset-0 bg-gradient-to-b from-[#4bb0ff] to-[#1a7cd8] border-[4px] border-[#0e5091] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden transition-all duration-700 ease-in-out z-0"
-                                style={{ clipPath: currentPlayer === 'p2' ? 'circle(150% at 50% 50%)' : 'circle(0% at 50% 50%)' }}
+                    <div className="mt-auto px-4 pb-6 sm:pb-5 pt-1 z-10 relative">
+                        <div className={`player-area-art relative flex flex-col items-center transition-shadow duration-700 ${panelOuterShadowClass}`}>
+                            <img
+                                src="images/area-red.png"
+                                alt=""
+                                aria-hidden="true"
+                                className={`player-area-skin z-0 ${currentPlayer === 'p1' ? 'opacity-100' : 'opacity-0'}`}
+                            />
+                            <img
+                                src="images/area-blue.png"
+                                alt=""
+                                aria-hidden="true"
+                                className={`player-area-skin z-0 ${currentPlayer === 'p2' ? 'opacity-100' : 'opacity-0'}`}
                             />
 
-                            <div className="relative z-10 w-full flex flex-col items-center">
-                                <div className="text-white font-bold text-xl mb-4 drop-shadow-md">
+                            <div className="absolute inset-[8%] z-10 flex flex-col items-center justify-center">
+                                <div className="text-white font-bold text-xl mb-2 drop-shadow-md">
                                     {notification ? notification : `${players[currentPlayer].name}'s Turn`}
                                 </div>
                                 
-                                <div className="flex w-full items-center justify-between gap-4 min-h-[70px]">
+                                <div className="flex w-full items-center justify-between gap-4 min-h-[64px]">
                                     <Dice rolling={diceRolling} value={diceTarget} />
                                     
                                     {isRollDisabled ? (
