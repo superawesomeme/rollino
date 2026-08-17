@@ -1,7 +1,6 @@
 /* =========================================
    1. GLOBAL BACKGROUNDS & GRADIENTS
 ========================================= */
-body,
 .bg-app-gradient {
   background-color: #92d9df;
   background-image: url('../images/rollino-background.jpg');
@@ -16,14 +15,13 @@ body,
 }
 
 /* =========================================
-   2. PNG GAME ART
+   2. GAME ART & DOMINO DETAILS
 ========================================= */
 .game-board-art {
   background-image: url('../images/wooden-board.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  /* Keep the domino grid inside the recessed centre of the artwork. */
   padding: 6.3% 7% 8.4% 7%;
   filter: drop-shadow(0 12px 16px rgba(0,0,0,0.20));
 }
@@ -34,27 +32,70 @@ body,
   user-select: none;
 }
 
-.domino-pip {
-  box-shadow: inset 0 2px 3px rgba(0,0,0,0.65),
-              inset 0 -1px 1px rgba(255,255,255,0.18);
+/* Percentage-based centering keeps placed counters aligned at every board size.
+   The small optical lift centres the visible disc on the cream domino face. */
+.board-counter-position {
+  left: 50%;
+  top: 50%;
+  width: 82%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -52.5%);
+  pointer-events: none;
 }
 
-/* Recessed divider between the two halves of each domino. */
-.domino-half-left::after {
+.board-counter-art {
+  filter: drop-shadow(0 2px 2.5px rgba(64, 31, 14, 0.30));
+}
+
+/* Board pips only. Dice pips intentionally keep their flatter treatment. */
+.domino-pip {
+  box-shadow:
+    inset 1px 1px 2px rgba(0,0,0,0.55),
+    inset -1px -1px 1px rgba(255,255,255,0.22);
+}
+
+/* A short, rounded, recessed divider between the two halves of a domino. */
+.domino-cell-left::after {
   content: '';
   position: absolute;
-  top: 12%;
-  bottom: 12%;
+  z-index: 5;
   right: -2px;
+  top: 14%;
+  bottom: 14%;
   width: 4px;
   border-radius: 999px;
-  background: #b97850;
+  background: #b97852;
   box-shadow:
-    inset 1px 0 1px rgba(80, 38, 18, 0.45),
-    inset -1px 0 1px rgba(255, 241, 222, 0.35),
-    0 1px 1px rgba(255, 255, 255, 0.18);
+    inset 1px 0 1px rgba(255,255,255,0.42),
+    inset -1px 0 1px rgba(87,42,19,0.34),
+    0 1px 1px rgba(255,255,255,0.18);
   pointer-events: none;
-  z-index: 2;
+}
+
+/* Mobile game layout: keep the board and controls grouped instead of
+   distributing them across the full viewport height. */
+.playing-viewport,
+.playing-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@media (max-width: 639px) {
+  .playing-header {
+    padding-top: 1rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .playing-board-area {
+    flex: 0 0 auto;
+    align-items: flex-start;
+  }
+
+  .playing-controls-area {
+    margin-top: 0.85rem;
+    padding-top: 0;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
 }
 
 /* =========================================
