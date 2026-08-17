@@ -427,12 +427,12 @@ function App() {
         <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
                 <div className="flex justify-center mb-8">
-                    <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-48 h-auto drop-shadow-md" />
+                    <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-72 h-auto max-w-full drop-shadow-md" />
                 </div>
                 
                 <div className="space-y-6 mb-8 text-left">
                     <div>
-                        <label className="text-sm font-bold text-gray-500 uppercase tracking-wide ml-2 mb-1 block">Player 1</label>
+                        <label className="font-secular-one text-sm text-gray-500 uppercase tracking-wide ml-2 mb-1 block">Player 1</label>
                         <div className="relative">
                             <img src="images/counter-red.png" alt="" aria-hidden="true" className="counter-art absolute left-3.5 top-1/2 -translate-y-1/2 w-6 h-6" />
                             <input type="text" value={players.p1.name} onChange={e => setPlayers({...players, p1: {...players.p1, name: e.target.value}})} className="w-full bg-gray-100/50 text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent focus:bg-white transition-all font-medium" maxLength={12} />
@@ -441,7 +441,7 @@ function App() {
 
                     <div className="border-t border-gray-200 pt-6">
                         <div className="flex items-center justify-between mb-3 px-2">
-                            <label className="text-sm font-bold text-gray-500 uppercase tracking-wide">Player 2</label>
+                            <label className="font-secular-one text-sm text-gray-500 uppercase tracking-wide">Player 2</label>
                             <div className="flex bg-gray-100 p-1 rounded-xl">
                                 <button onClick={() => setPlayers({...players, p2: {...players.p2, isBot: false, name: 'Player 2'}})} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${!players.p2.isBot ? 'bg-white shadow-sm text-[#298de6]' : 'text-gray-400'}`}>Human</button>
                                 <button onClick={() => setPlayers({...players, p2: {...players.p2, isBot: true, name: 'Rolly'}})} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${players.p2.isBot ? 'bg-white shadow-sm text-[#298de6]' : 'text-gray-400'}`}>Computer</button>
@@ -455,10 +455,10 @@ function App() {
                 </div>
                 
                 <div className="space-y-3">
-                    <button onClick={() => startGame(false)} className="w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] font-black text-xl py-4 rounded-full shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px] transition-all">
+                    <button onClick={() => startGame(false)} className="font-secular-one w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] text-xl py-4 rounded-full shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px] transition-all">
                         PLAY
                     </button>
-                    <button onClick={() => setGamePhase('instructions')} className="w-full bg-gray-100/50 hover:bg-gray-200/80 text-[#4a8f9c] font-bold text-lg py-3 rounded-full shadow-[0_4px_0_rgba(74,143,156,0.15)] active:shadow-[0_0px_0_rgba(74,143,156,0.15)] active:translate-y-[4px] transition-all border border-black/5">
+                    <button onClick={() => setGamePhase('instructions')} className="font-secular-one w-full bg-gray-100/50 hover:bg-gray-200/80 text-[#4a8f9c] text-lg py-3 rounded-full shadow-[0_4px_0_rgba(74,143,156,0.15)] active:shadow-[0_0px_0_rgba(74,143,156,0.15)] active:translate-y-[4px] transition-all border border-black/5">
                         HOW TO PLAY
                     </button>
                 </div>
@@ -610,7 +610,7 @@ function App() {
                             />
 
                             <div className="relative z-10 w-full flex flex-col items-center">
-                                <div className="text-white font-bold text-xl mb-4 drop-shadow-md">
+                                <div className="font-secular-one text-white text-xl mb-4 drop-shadow-md">
                                     {notification ? notification : `${players[currentPlayer].name}'s Turn`}
                                 </div>
                                 
@@ -619,14 +619,14 @@ function App() {
                                     
                                     {isRollDisabled ? (
                                         <div className="flex-1 flex items-center justify-center">
-                                            <span className="text-white font-black text-2xl animate-pulse tracking-widest drop-shadow-lg">
+                                            <span className="font-secular-one text-white text-2xl animate-pulse tracking-widest drop-shadow-lg">
                                                 {actionText}
                                             </span>
                                         </div>
                                     ) : (
                                         <button 
                                             onClick={handleRoll}
-                                            className="flex-1 py-4 rounded-full font-black text-xl transition-all bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px]"
+                                            className="font-secular-one flex-1 py-4 rounded-full text-xl transition-all bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px]"
                                         >
                                             {actionText}
                                         </button>

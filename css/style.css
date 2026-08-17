@@ -10,6 +10,13 @@
   background-attachment: fixed;
 }
 
+
+/* Selective display font. Keep the rest of the interface on the original sans font. */
+.font-secular-one {
+  font-family: "Secular One", sans-serif;
+  font-weight: 400;
+}
+
 .shadow-board {
   box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 2px 5px rgba(255,255,255,0.4);
 }
