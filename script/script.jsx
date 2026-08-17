@@ -167,7 +167,7 @@ const Fireworks = ({ winnerColour }) => {
     return <canvas ref={canvasRef} className="absolute inset-0 z-0 pointer-events-none w-full h-full" />;
 };
 
-const PipLayout = ({ val }) => {
+const PipLayout = ({ val, recessed = false }) => {
     const gridMap = {
         0: [], 1: [4], 2: [2, 6], 3: [2, 4, 6],
         4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 3, 6, 2, 5, 8]
@@ -179,7 +179,7 @@ const PipLayout = ({ val }) => {
             {[...Array(9)].map((_, i) => (
                 <div key={i} className="flex items-center justify-center w-full h-full">
                     {active.includes(i) && (
-                        <div style={{ width: '85%', aspectRatio: '1/1' }} className="rounded-full bg-[#535860]"></div>
+                        <div style={{ width: '85%', aspectRatio: '1/1' }} className={`rounded-full bg-[#535860] ${recessed ? 'domino-pip' : ''}`}></div>
                     )}
                 </div>
             ))}
@@ -200,7 +200,7 @@ const Token = ({ color, animate }) => (
 
 const Cell = ({ cell, onClick, isValid, isLeft }) => (
     <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'border-r-2 border-[#d4bca4]' : ''}`}>
-        <PipLayout val={cell.value} />
+        <PipLayout val={cell.value} recessed={true} />
         {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} animate={true} />}
         {isValid && (
             <div className="absolute inset-0 rounded-[8px] border-[3px] border-[#ffd659] shadow-[inset_0_0_10px_rgba(255,214,89,0.5)] animate-pulse pointer-events-none z-10"></div>
@@ -598,27 +598,21 @@ function App() {
                     </div>
 
                     {/* BOTTOM CONTROL PANEL */}
-                    <div className="mt-auto px-4 pb-6 sm:pb-5 pt-1 z-10 relative">
-                        <div className={`player-area-art relative flex flex-col items-center transition-shadow duration-700 ${panelOuterShadowClass}`}>
-                            <img
-                                src="images/area-red.png"
-                                alt=""
-                                aria-hidden="true"
-                                className={`player-area-skin z-0 ${currentPlayer === 'p1' ? 'opacity-100' : 'opacity-0'}`}
-                            />
-                            <img
-                                src="images/area-blue.png"
-                                alt=""
-                                aria-hidden="true"
-                                className={`player-area-skin z-0 ${currentPlayer === 'p2' ? 'opacity-100' : 'opacity-0'}`}
+                    <div className="mt-auto px-4 pb-8 sm:pb-6 pt-2 z-10 relative">
+                        <div className={`rounded-[24px] relative flex flex-col items-center p-5 transition-shadow duration-700 ${panelOuterShadowClass}`}>
+                            <div className="absolute inset-0 bg-gradient-to-b from-[#f95757] to-[#d62828] border-[4px] border-[#a81a1a] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden" />
+
+                            <div 
+                                className="absolute inset-0 bg-gradient-to-b from-[#4bb0ff] to-[#1a7cd8] border-[4px] border-[#0e5091] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden transition-all duration-700 ease-in-out z-0"
+                                style={{ clipPath: currentPlayer === 'p2' ? 'circle(150% at 50% 50%)' : 'circle(0% at 50% 50%)' }}
                             />
 
-                            <div className="absolute inset-[8%] z-10 flex flex-col items-center justify-center">
-                                <div className="text-white font-bold text-xl mb-2 drop-shadow-md">
+                            <div className="relative z-10 w-full flex flex-col items-center">
+                                <div className="text-white font-bold text-xl mb-4 drop-shadow-md">
                                     {notification ? notification : `${players[currentPlayer].name}'s Turn`}
                                 </div>
                                 
-                                <div className="flex w-full items-center justify-between gap-4 min-h-[64px]">
+                                <div className="flex w-full items-center justify-between gap-4 min-h-[70px]">
                                     <Dice rolling={diceRolling} value={diceTarget} />
                                     
                                     {isRollDisabled ? (
