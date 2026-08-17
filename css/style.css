@@ -42,12 +42,12 @@
 /* Percentage-based centering keeps placed counters aligned at every board size.
    The small optical lift centres the visible disc on the cream domino face. */
 .board-counter-position {
-  left: 50%;
-  top: 50%;
-  width: 82%;
-  aspect-ratio: 1 / 1;
-  transform: translate(-50%, -52.5%);
-  pointer-events: none;
+    left: 50%;
+    top: 51%;
+    width: 82%;
+    aspect-ratio: 1 / 1;
+    transform: translate(-50%, -52.5%);
+    pointer-events: none;
 }
 
 .board-counter-art {
