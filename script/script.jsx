@@ -667,4 +667,11 @@ function App() {
         <React.Fragment>
             {gamePhase === 'setup' && renderSetup()}
             {gamePhase === 'instructions' && renderInstructions()}
-            {(gamePhase === 'playing' || gamePhase === 'gameOver') && renderPlaying
+            {(gamePhase === 'playing' || gamePhase === 'gameOver') && renderPlaying()}
+        </React.Fragment>
+    );
+}
+
+// Render the application to the DOM
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
