@@ -205,7 +205,7 @@ const Cell = ({ cell, onClick, isValid, isLeft }) => (
         <PipLayout val={cell.value} recessed={true} />
         {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} animate={true} />}
         {isValid && (
-            <div className="absolute inset-0 rounded-[8px] border-[3px] border-[#ffd659] shadow-[inset_0_0_10px_rgba(255,214,89,0.5)] animate-pulse pointer-events-none z-10"></div>
+            <div className="valid-move-hint absolute inset-0 rounded-[8px] pointer-events-none z-10"></div>
         )}
     </div>
 );
@@ -602,10 +602,10 @@ function App() {
                     {/* BOTTOM CONTROL PANEL */}
                     <div className="playing-controls-area mt-3 sm:mt-auto px-4 pb-6 sm:pb-5 pt-0 sm:pt-1 z-10 relative">
                         <div className={`rounded-[24px] relative flex flex-col items-center p-5 transition-shadow duration-700 ${panelOuterShadowClass}`}>
-                            <div className="absolute inset-0 bg-gradient-to-b from-[#f95757] to-[#d62828] border-[4px] border-[#a81a1a] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden" />
+                            <div className="player-panel-glass-red absolute inset-0" />
 
                             <div
-                                className="absolute inset-0 bg-gradient-to-b from-[#4bb0ff] to-[#1a7cd8] border-[4px] border-[#0e5091] rounded-[24px] shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] overflow-hidden transition-all duration-700 ease-in-out z-0"
+                                className="player-panel-glass-blue absolute inset-0 transition-all duration-700 ease-in-out z-0"
                                 style={{ clipPath: currentPlayer === 'p2' ? 'circle(150% at 50% 50%)' : 'circle(0% at 50% 50%)' }}
                             />
 
