@@ -187,15 +187,13 @@ const PipLayout = ({ val, recessed = false }) => {
     );
 };
 
-const Token = ({ color, animate }) => (
+const Token = ({ color }) => (
     <div className="board-counter-position absolute z-20">
         <img
             src={`images/counter-${color}.png`}
             alt=""
             aria-hidden="true"
-            className={`counter-art board-counter-art w-full h-full transform transition-all duration-300
-                ${animate ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}
-            `}
+            className="counter-art board-counter-art w-full h-full"
         />
     </div>
 );
@@ -203,7 +201,7 @@ const Token = ({ color, animate }) => (
 const Cell = ({ cell, onClick, isValid, isLeft }) => (
     <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'domino-cell-left' : ''}`}>
         <PipLayout val={cell.value} recessed={true} />
-        {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} animate={true} />}
+        {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} />}
         {isValid && (
             <div className="valid-move-hint absolute inset-0 rounded-[8px] pointer-events-none z-10"></div>
         )}
@@ -610,8 +608,8 @@ function App() {
                             />
 
                             <div className="relative z-10 w-full flex flex-col items-center">
-                                <div className="font-poetsen-one text-white text-xl mb-4 drop-shadow-md">
-                                    {notification ? notification : `${players[currentPlayer].name}'s Turn`}
+                                <div className="font-poetsen-one text-white text-2xl mb-4 drop-shadow-md">
+                                    {notification ? notification : `${players[currentPlayer].name}'s turn`}
                                 </div>
                                 
                                 <div className="flex w-full items-center justify-between gap-4 min-h-[70px]">
