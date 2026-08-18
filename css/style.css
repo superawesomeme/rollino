@@ -55,8 +55,7 @@
 /* Board pips only. Dice pips intentionally keep their flatter treatment. */
 .domino-pip {
   box-shadow:
-    inset 1px 1px 2px rgba(0,0,0,0.55),
-    inset -1px -1px 1px rgba(255,255,255,0.22);
+    inset 1px 1px 2px rgba(0,0,0,0.55);
 }
 
 /* A short, rounded, recessed divider between the two halves of a domino. */
@@ -69,11 +68,8 @@
   bottom: 14%;
   width: 4px;
   border-radius: 999px;
-  background: #b97852;
-  box-shadow:
-    inset 1px 0 1px rgba(255,255,255,0.42),
-    inset -1px 0 1px rgba(87,42,19,0.34),
-    0 1px 1px rgba(255,255,255,0.18);
+  background: #d3bca5;
+  box-shadow: inset 1px 1px 1px rgba(87, 42, 19, 0.34);
   pointer-events: none;
 }
 
