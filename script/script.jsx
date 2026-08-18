@@ -610,8 +610,8 @@ function App() {
                             />
 
                             <div className="relative z-10 w-full flex flex-col items-center">
-                                <div className={`font-poetsen-one text-white mb-4 drop-shadow-md ${notification ? 'text-xl' : 'text-2xl'}`}>
-                                    {notification ? notification : `${players[currentPlayer].name}'s turn`}
+                                <div className="font-poetsen-one text-white text-xl mb-4 drop-shadow-md">
+                                    {notification ? notification : `${players[currentPlayer].name}'s Turn`}
                                 </div>
                                 
                                 <div className="flex w-full items-center justify-between gap-4 min-h-[70px]">
