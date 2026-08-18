@@ -167,7 +167,7 @@ const Fireworks = ({ winnerColour }) => {
     return <canvas ref={canvasRef} className="absolute inset-0 z-0 pointer-events-none w-full h-full" />;
 };
 
-const PipLayout = ({ val }) => {
+const PipLayout = ({ val, recessed = false }) => {
     const gridMap = {
         0: [], 1: [4], 2: [2, 6], 3: [2, 4, 6],
         4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 3, 6, 2, 5, 8]
@@ -179,7 +179,7 @@ const PipLayout = ({ val }) => {
             {[...Array(9)].map((_, i) => (
                 <div key={i} className="flex items-center justify-center w-full h-full">
                     {active.includes(i) && (
-                        <div style={{ width: '85%', aspectRatio: '1/1' }} className="rounded-full bg-[#535860]"></div>
+                        <div style={{ width: '85%', aspectRatio: '1/1' }} className={`rounded-full bg-[#535860] ${recessed ? 'domino-pip' : ''}`}></div>
                     )}
                 </div>
             ))}
@@ -188,22 +188,24 @@ const PipLayout = ({ val }) => {
 };
 
 const Token = ({ color, animate }) => (
-    <img
-        src={`images/counter-${color}.png`}
-        alt=""
-        aria-hidden="true"
-        className={`counter-art absolute inset-0 m-auto w-[82%] aspect-square transform transition-all duration-300 z-20
-            ${animate ? 'scale-100 opacity-100 -translate-y-[2px]' : 'scale-50 opacity-0 translate-y-0'}
-        `}
-    />
+    <div className="board-counter-position absolute z-20">
+        <img
+            src={`images/counter-${color}.png`}
+            alt=""
+            aria-hidden="true"
+            className={`counter-art board-counter-art w-full h-full transform transition-all duration-300
+                ${animate ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}
+            `}
+        />
+    </div>
 );
 
 const Cell = ({ cell, onClick, isValid, isLeft }) => (
-    <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'border-r-2 border-[#d4bca4]' : ''}`}>
-        <PipLayout val={cell.value} />
+    <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'domino-cell-left' : ''}`}>
+        <PipLayout val={cell.value} recessed={true} />
         {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} animate={true} />}
         {isValid && (
-            <div className="absolute inset-0 rounded-[8px] border-[3px] border-[#ffd659] shadow-[inset_0_0_10px_rgba(255,214,89,0.5)] animate-pulse pointer-events-none z-10"></div>
+            <div className="valid-move-hint absolute inset-0 rounded-[8px] pointer-events-none z-10"></div>
         )}
     </div>
 );
@@ -425,12 +427,12 @@ function App() {
         <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
                 <div className="flex justify-center mb-8">
-                    <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-48 h-auto drop-shadow-md" />
+                    <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-72 h-auto max-w-full drop-shadow-md" />
                 </div>
                 
                 <div className="space-y-6 mb-8 text-left">
                     <div>
-                        <label className="text-sm font-bold text-gray-500 uppercase tracking-wide ml-2 mb-1 block">Player 1</label>
+                        <label className="font-poetsen-one text-sm text-gray-500 uppercase tracking-wide ml-2 mb-1 block">Player 1</label>
                         <div className="relative">
                             <img src="images/counter-red.png" alt="" aria-hidden="true" className="counter-art absolute left-3.5 top-1/2 -translate-y-1/2 w-6 h-6" />
                             <input type="text" value={players.p1.name} onChange={e => setPlayers({...players, p1: {...players.p1, name: e.target.value}})} className="w-full bg-gray-100/50 text-gray-800 px-12 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#61adc0] border-2 border-transparent focus:bg-white transition-all font-medium" maxLength={12} />
@@ -439,7 +441,7 @@ function App() {
 
                     <div className="border-t border-gray-200 pt-6">
                         <div className="flex items-center justify-between mb-3 px-2">
-                            <label className="text-sm font-bold text-gray-500 uppercase tracking-wide">Player 2</label>
+                            <label className="font-poetsen-one text-sm text-gray-500 uppercase tracking-wide">Player 2</label>
                             <div className="flex bg-gray-100 p-1 rounded-xl">
                                 <button onClick={() => setPlayers({...players, p2: {...players.p2, isBot: false, name: 'Player 2'}})} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${!players.p2.isBot ? 'bg-white shadow-sm text-[#298de6]' : 'text-gray-400'}`}>Human</button>
                                 <button onClick={() => setPlayers({...players, p2: {...players.p2, isBot: true, name: 'Rolly'}})} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${players.p2.isBot ? 'bg-white shadow-sm text-[#298de6]' : 'text-gray-400'}`}>Computer</button>
@@ -453,10 +455,10 @@ function App() {
                 </div>
                 
                 <div className="space-y-3">
-                    <button onClick={() => startGame(false)} className="w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] font-black text-xl py-4 rounded-full shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px] transition-all">
+                    <button onClick={() => startGame(false)} className="font-poetsen-one w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] text-xl py-4 rounded-full shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px] transition-all">
                         PLAY
                     </button>
-                    <button onClick={() => setGamePhase('instructions')} className="w-full bg-gray-100/50 hover:bg-gray-200/80 text-[#4a8f9c] font-bold text-lg py-3 rounded-full shadow-[0_4px_0_rgba(74,143,156,0.15)] active:shadow-[0_0px_0_rgba(74,143,156,0.15)] active:translate-y-[4px] transition-all border border-black/5">
+                    <button onClick={() => setGamePhase('instructions')} className="font-poetsen-one w-full bg-gray-100/50 hover:bg-gray-200/80 text-[#4a8f9c] text-lg py-3 rounded-full shadow-[0_4px_0_rgba(74,143,156,0.15)] active:shadow-[0_0px_0_rgba(74,143,156,0.15)] active:translate-y-[4px] transition-all border border-black/5">
                         HOW TO PLAY
                     </button>
                 </div>
@@ -547,11 +549,11 @@ function App() {
         }
 
         return (
-            <div className="min-h-screen flex items-start sm:items-center justify-center sm:p-4">
-                <div className="w-full min-h-screen sm:min-h-0 sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
+            <div className="playing-viewport min-h-screen flex items-start sm:items-center justify-center sm:p-4">
+                <div className="playing-shell w-full min-h-screen sm:min-h-0 sm:h-[90vh] sm:max-h-[900px] sm:max-w-md sm:rounded-[40px] overflow-hidden relative flex flex-col">
                     
                     {/* HEADER */}
-                    <div className="px-5 pt-8 sm:pt-6 pb-4 flex justify-between items-center z-10 relative">
+                    <div className="playing-header px-5 pt-8 sm:pt-6 pb-4 flex justify-between items-center z-10 relative">
                         <button onClick={() => setGamePhase('setup')} className="w-12 h-12 bg-white/40 hover:bg-white/60 rounded-[14px] flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors text-[#5a9a9c]">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
@@ -573,7 +575,7 @@ function App() {
                     </div>
 
                     {/* BOARD AREA */}
-                    <div className="flex-1 px-4 sm:px-6 flex items-center justify-center z-10 relative">
+                    <div className="playing-board-area flex-none sm:flex-1 px-4 sm:px-6 flex items-center justify-center z-10 relative">
                         <div className="game-board-art w-full aspect-square max-w-[380px] relative mx-auto">
                             <div className="relative z-10 w-full h-full grid grid-rows-6 gap-[4px] sm:gap-[6px]">
                                 {[0, 1, 2, 3, 4, 5].map(r => (
@@ -598,39 +600,33 @@ function App() {
                     </div>
 
                     {/* BOTTOM CONTROL PANEL */}
-                    <div className="mt-auto px-4 pb-6 sm:pb-5 pt-1 z-10 relative">
-                        <div className={`player-area-art relative flex flex-col items-center transition-shadow duration-700 ${panelOuterShadowClass}`}>
-                            <img
-                                src="images/area-red.png"
-                                alt=""
-                                aria-hidden="true"
-                                className={`player-area-skin z-0 ${currentPlayer === 'p1' ? 'opacity-100' : 'opacity-0'}`}
-                            />
-                            <img
-                                src="images/area-blue.png"
-                                alt=""
-                                aria-hidden="true"
-                                className={`player-area-skin z-0 ${currentPlayer === 'p2' ? 'opacity-100' : 'opacity-0'}`}
+                    <div className="playing-controls-area mt-3 sm:mt-auto px-4 pb-6 sm:pb-5 pt-0 sm:pt-1 z-10 relative">
+                        <div className={`rounded-[24px] relative flex flex-col items-center p-5 transition-shadow duration-700 ${panelOuterShadowClass}`}>
+                            <div className="player-panel-glass-red absolute inset-0" />
+
+                            <div
+                                className="player-panel-glass-blue absolute inset-0 transition-all duration-700 ease-in-out z-0"
+                                style={{ clipPath: currentPlayer === 'p2' ? 'circle(150% at 50% 50%)' : 'circle(0% at 50% 50%)' }}
                             />
 
-                            <div className="absolute inset-[8%] z-10 flex flex-col items-center justify-center">
-                                <div className="text-white font-bold text-xl mb-2 drop-shadow-md">
-                                    {notification ? notification : `${players[currentPlayer].name}'s Turn`}
+                            <div className="relative z-10 w-full flex flex-col items-center">
+                                <div className={`font-poetsen-one text-white mb-4 drop-shadow-md ${notification ? 'text-xl' : 'text-2xl'}`}>
+                                    {notification ? notification : `${players[currentPlayer].name}'s turn`}
                                 </div>
                                 
-                                <div className="flex w-full items-center justify-between gap-4 min-h-[64px]">
+                                <div className="flex w-full items-center justify-between gap-4 min-h-[70px]">
                                     <Dice rolling={diceRolling} value={diceTarget} />
                                     
                                     {isRollDisabled ? (
                                         <div className="flex-1 flex items-center justify-center">
-                                            <span className="text-white font-black text-2xl animate-pulse tracking-widest drop-shadow-lg">
+                                            <span className="font-poetsen-one text-white text-2xl animate-pulse tracking-widest drop-shadow-lg">
                                                 {actionText}
                                             </span>
                                         </div>
                                     ) : (
                                         <button 
                                             onClick={handleRoll}
-                                            className="flex-1 py-4 rounded-full font-black text-xl transition-all bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px]"
+                                            className="font-poetsen-one flex-1 py-4 rounded-full text-xl transition-all bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] shadow-[0_6px_0_#c27a00,0_10px_10px_rgba(0,0,0,0.2)] active:shadow-[0_0px_0_#c27a00,0_2px_5px_rgba(0,0,0,0.2)] active:translate-y-[6px]"
                                         >
                                             {actionText}
                                         </button>
@@ -647,15 +643,15 @@ function App() {
                             <Fireworks winnerColour={winnerFireworkColour} />
                             
                             <div className={`relative z-10 rounded-[32px] p-8 text-center shadow-[0_0_50px_rgba(0,0,0,0.6)] max-w-sm w-[90%] transform scale-100 animate-in zoom-in-95 border-4 ${winnerBgClass}`}>
-                                <h2 className={`text-3xl font-black mb-6 uppercase ${winnerTextClass}`}>
+                                <h2 className={`font-poetsen-one text-3xl mb-6 uppercase ${winnerTextClass}`}>
                                     {winner === 'draw' ? 'Match Drawn!' : `${players[winner].name} Wins!`}
                                 </h2>
                                 
                                 <div className="space-y-4">
-                                    <button onClick={() => startGame(true)} className="w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] font-black text-lg py-4 rounded-full shadow-[0_6px_0_#c27a00] active:shadow-[0_0px_0_#c27a00] active:translate-y-[6px] transition-all">
+                                    <button onClick={() => startGame(true)} className="font-poetsen-one w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] text-lg py-4 rounded-full shadow-[0_6px_0_#c27a00] active:shadow-[0_0px_0_#c27a00] active:translate-y-[6px] transition-all">
                                         PLAY ROUND {roundNumber + 1}
                                     </button>
-                                    <button onClick={() => setGamePhase('setup')} className="w-full bg-gray-100/50 hover:bg-gray-200/80 text-gray-800 font-bold text-lg py-4 rounded-full shadow-[0_6px_0_rgba(0,0,0,0.1)] active:shadow-[0_0px_0_rgba(0,0,0,0.1)] active:translate-y-[6px] transition-all backdrop-blur-sm border border-black/10">
+                                    <button onClick={() => setGamePhase('setup')} className="font-poetsen-one w-full bg-gray-100/50 hover:bg-gray-200/80 text-gray-800 text-lg py-4 rounded-full shadow-[0_6px_0_rgba(0,0,0,0.1)] active:shadow-[0_0px_0_rgba(0,0,0,0.1)] active:translate-y-[6px] transition-all backdrop-blur-sm border border-black/10">
                                         MAIN MENU
                                     </button>
                                 </div>
