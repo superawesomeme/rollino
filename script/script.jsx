@@ -585,7 +585,7 @@ function App() {
                                             const isValid2 = gamePhase === 'playing' && !diceRolling && currentRoll !== null && c2.value === currentRoll && c2.owner === null;
                                             
                                             return (
-                                                <div key={d} className="flex bg-[#fbe6d3] rounded-[8px] sm:rounded-[10px] shadow-[0_3px_5px_rgba(0,0,0,0.15)] border-b-[3px] border-[#d4bca4] overflow-hidden">
+                                                <div key={d} className="flex bg-[#fbe6d3] rounded-[15px] shadow-[0_3px_5px_rgba(0,0,0,0.15)] border-b-[3px] border-[#d4bca4] overflow-hidden">
                                                     <Cell cell={c1} onClick={() => !isBotTurn && handleCellClick(c1.id)} isValid={isValid1} isLeft={true} />
                                                     <Cell cell={c2} onClick={() => !isBotTurn && handleCellClick(c2.id)} isValid={isValid2} isLeft={false} />
                                                 </div>
