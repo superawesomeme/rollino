@@ -59,18 +59,14 @@
 
 .bonus-star {
   position: absolute;
-  left: 50%;
-  top: 49%;
+  left: 52%;
+  top: 42%;
   transform: translate(-50%, -50%);
   z-index: 3;
-  font-size: clamp(14px, 5vw, 22px);
+  font-size: clamp(20px, 7vw, 30px);
   line-height: 1;
-  color: rgba(255,255,255,0.20);
-  -webkit-text-stroke: 1px rgba(68, 29, 12, 0.20);
-  text-shadow:
-    -1px -1px 1px rgba(255,255,255,0.48),
-    1px 1px 1px rgba(40,15,5,0.40);
-  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.12));
+  color: rgba(0, 0, 0, 0.20);
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.12));
   pointer-events: none;
   user-select: none;
 }
@@ -83,10 +79,12 @@
 
 /* Winning line: a short staggered gold sweep before the winner modal appears. */
 .winning-line-highlight {
-  border: 3px solid rgb(255, 192, 0);
-  box-shadow:
-    inset 0 0 10px rgba(255, 210, 52, 0.78),
-    0 0 8px rgba(255, 192, 0, 0.82);
+  border: 0;
+  background: radial-gradient(circle at center,
+    rgba(255, 225, 92, 0.34) 0%,
+    rgba(255, 192, 0, 0.14) 52%,
+    rgba(255, 192, 0, 0) 78%);
+  box-shadow: none;
   opacity: 0;
   animation: winning-line-sweep 720ms ease-out var(--win-delay, 0ms) forwards,
              winning-line-breathe 780ms ease-in-out calc(var(--win-delay, 0ms) + 720ms) 2 alternate;
@@ -103,8 +101,8 @@
 }
 
 @keyframes winning-line-breathe {
-  from { opacity: 0.78; box-shadow: inset 0 0 8px rgba(255,210,52,0.62), 0 0 6px rgba(255,192,0,0.64); }
-  to { opacity: 1; box-shadow: inset 0 0 16px rgba(255,225,92,0.94), 0 0 16px rgba(255,192,0,0.94); }
+  from { opacity: 0.62; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1.06); }
 }
 
 @keyframes winning-counter-pulse {
