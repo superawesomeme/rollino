@@ -189,6 +189,13 @@
   pointer-events: none;
 }
 
+
+/* Setup screen: on phones, keep the card nearer the top rather than vertically centering it. */
+.setup-viewport {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 /* Mobile game layout: keep the board and controls grouped instead of
    distributing them across the full viewport height. */
 .playing-viewport,
@@ -198,6 +205,12 @@
 }
 
 @media (max-width: 639px) {
+  .setup-viewport {
+    justify-content: flex-start;
+    padding-top: clamp(1.5rem, 5dvh, 3rem);
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+
   .playing-header {
     padding-top: 1rem;
     padding-bottom: 0.35rem;
