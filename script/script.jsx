@@ -520,7 +520,7 @@ function App() {
        RENDER: SETUP VIEW
     ========================================================================== */
     const renderSetup = () => (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <div className="setup-viewport min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
                 <div className="flex justify-center mb-8">
                     <img src="images/rollino-logo.png" alt="Rollino Logo" className="w-72 h-auto max-w-full drop-shadow-md" />
