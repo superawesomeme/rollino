@@ -12,58 +12,90 @@ const DICE_ROTATIONS = {
     6: { x: 180, y: 0 }
 };
 
-const generateGame = () => {
-    let all = [];
-    for (let i = 0; i <= 6; i++) {
-        for (let j = i + 1; j <= 6; j++) {
-            all.push([i, j]);
-        }
-    }
-    for (let i = all.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [all[i], all[j]] = [all[j], all[i]];
-    }
-    
-    let selected = all.slice(0, 18);
-    let newBoard = [];
-    
-    for (let r = 0; r < 6; r++) {
-        for (let d = 0; d < 3; d++) {
-            let domIndex = r * 3 + d;
-            let domino = selected[domIndex];
-            if (Math.random() > 0.5) domino = [domino[1], domino[0]];
-            
-            newBoard.push({ id: r * 6 + d * 2, value: domino[0], owner: null });
-            newBoard.push({ id: r * 6 + d * 2 + 1, value: domino[1], owner: null });
-        }
-    }
-    return newBoard;
-};
-
-const checkWin = (b, pId) => {
-    const owner = (r, c) => (r >= 0 && r < 6 && c >= 0 && c < 6) ? b[r * 6 + c].owner : null;
-    
+const hasAdjacentBlanks = (board) => {
     for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 6; c++) {
-            if (owner(r, c) !== pId) continue;
-            if (owner(r, c + 1) === pId && owner(r, c + 2) === pId && owner(r, c + 3) === pId) return true;
-            if (owner(r + 1, c) === pId && owner(r + 2, c) === pId && owner(r + 3, c) === pId) return true;
-            if (owner(r + 1, c + 1) === pId && owner(r + 2, c + 2) === pId && owner(r + 3, c + 3) === pId) return true;
-            if (owner(r + 1, c - 1) === pId && owner(r + 2, c - 2) === pId && owner(r + 3, c - 3) === pId) return true;
+            const i = r * 6 + c;
+            if (board[i].value !== 0) continue;
+            if (c < 5 && board[i + 1].value === 0) return true;
+            if (r < 5 && board[i + 6].value === 0) return true;
         }
     }
     return false;
 };
 
+const generateGame = () => {
+    const all = [];
+    for (let i = 0; i <= 6; i++) {
+        for (let j = i + 1; j <= 6; j++) {
+            all.push([i, j]);
+        }
+    }
+
+    // Rebuild until no two blank halves touch horizontally or vertically.
+    // With at most six blank halves in a 6x6 board this resolves very quickly,
+    // while retaining the existing random selection/orientation behaviour.
+    for (;;) {
+        const shuffled = [...all];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+
+        const selected = shuffled.slice(0, 18);
+        const newBoard = [];
+
+        for (let r = 0; r < 6; r++) {
+            for (let d = 0; d < 3; d++) {
+                const domIndex = r * 3 + d;
+                let domino = selected[domIndex];
+                if (Math.random() > 0.5) domino = [domino[1], domino[0]];
+
+                newBoard.push({ id: r * 6 + d * 2, value: domino[0], owner: null, isBonus: false });
+                newBoard.push({ id: r * 6 + d * 2 + 1, value: domino[1], owner: null, isBonus: false });
+            }
+        }
+
+        if (!hasAdjacentBlanks(newBoard)) return newBoard;
+    }
+
+
+};
+
+const findWinningLine = (b, pId) => {
+    const owner = (r, c) => (r >= 0 && r < 6 && c >= 0 && c < 6) ? b[r * 6 + c].owner : null;
+    const index = (r, c) => r * 6 + c;
+
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 6; c++) {
+            if (owner(r, c) !== pId) continue;
+
+            if (owner(r, c + 1) === pId && owner(r, c + 2) === pId && owner(r, c + 3) === pId) {
+                return [index(r, c), index(r, c + 1), index(r, c + 2), index(r, c + 3)];
+            }
+            if (owner(r + 1, c) === pId && owner(r + 2, c) === pId && owner(r + 3, c) === pId) {
+                return [index(r, c), index(r + 1, c), index(r + 2, c), index(r + 3, c)];
+            }
+            if (owner(r + 1, c + 1) === pId && owner(r + 2, c + 2) === pId && owner(r + 3, c + 3) === pId) {
+                return [index(r, c), index(r + 1, c + 1), index(r + 2, c + 2), index(r + 3, c + 3)];
+            }
+            if (owner(r + 1, c - 1) === pId && owner(r + 2, c - 2) === pId && owner(r + 3, c - 3) === pId) {
+                return [index(r, c), index(r + 1, c - 1), index(r + 2, c - 2), index(r + 3, c - 3)];
+            }
+        }
+    }
+    return null;
+};
+
 const claimWilds = (currentBoard, pId) => {
-    let boardCopy = [...currentBoard];
-    let changed = false;
-    
+    let boardCopy = currentBoard.map(cell => ({ ...cell }));
+    const bonusIndices = [];
+
     const checkPairs = (i) => {
         const r = Math.floor(i / 6);
         const c = i % 6;
         const owner = (row, col) => (row >= 0 && row < 6 && col >= 0 && col < 6) ? boardCopy[row * 6 + col].owner : null;
-        
+
         if (owner(r, c - 1) === pId && owner(r, c + 1) === pId) return true;
         if (owner(r - 1, c) === pId && owner(r + 1, c) === pId) return true;
         if (owner(r - 1, c - 1) === pId && owner(r + 1, c + 1) === pId) return true;
@@ -75,17 +107,15 @@ const claimWilds = (currentBoard, pId) => {
     do {
         passChanged = false;
         for (let i = 0; i < 36; i++) {
-            if (boardCopy[i].value === 0 && boardCopy[i].owner === null) {
-                if (checkPairs(i)) {
-                    boardCopy[i] = { ...boardCopy[i], owner: pId };
-                    changed = true;
-                    passChanged = true;
-                }
+            if (boardCopy[i].value === 0 && boardCopy[i].owner === null && checkPairs(i)) {
+                boardCopy[i] = { ...boardCopy[i], owner: pId, isBonus: true };
+                bonusIndices.push(i);
+                passChanged = true;
             }
         }
     } while (passChanged);
-    
-    return { newBoard: boardCopy, changed };
+
+    return { newBoard: boardCopy, bonusIndices };
 };
 
 /* ==========================================================================
@@ -187,23 +217,43 @@ const PipLayout = ({ val, recessed = false }) => {
     );
 };
 
-const Token = ({ color }) => (
-    <div className="board-counter-position absolute z-20">
+const Token = ({ color, isBonus = false, isWinning = false, winningOrder = 0 }) => (
+    <div
+        className={`board-counter-position absolute z-20 ${isBonus ? 'bonus-counter' : ''} ${isWinning ? 'winning-counter' : ''}`}
+        style={isWinning ? { '--win-delay': `${winningOrder * 140}ms` } : undefined}
+    >
         <img
             src={`images/counter-${color}.png`}
             alt=""
             aria-hidden="true"
             className="counter-art board-counter-art w-full h-full"
         />
+        {isBonus && <span className="bonus-star" aria-hidden="true">★</span>}
     </div>
 );
 
-const Cell = ({ cell, onClick, isValid, isLeft }) => (
-    <div onClick={onClick} className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'domino-cell-left' : ''}`}>
+const Cell = ({ cell, onClick, isValid, isLeft, isWinning = false, winningOrder = 0 }) => (
+    <div
+        onClick={onClick}
+        className={`relative w-full h-full flex-1 cursor-pointer flex items-center justify-center bg-transparent ${isLeft ? 'domino-cell-left' : ''}`}
+    >
         <PipLayout val={cell.value} recessed={true} />
-        {cell.owner && <Token color={cell.owner === 'p1' ? 'red' : 'blue'} />}
+        {cell.owner && (
+            <Token
+                color={cell.owner === 'p1' ? 'red' : 'blue'}
+                isBonus={cell.isBonus}
+                isWinning={isWinning}
+                winningOrder={winningOrder}
+            />
+        )}
         {isValid && (
-            <div className="valid-move-hint absolute inset-0 rounded-[8px] pointer-events-none z-10"></div>
+            <div className="valid-move-hint absolute inset-0 rounded-[12px] pointer-events-none z-10"></div>
+        )}
+        {isWinning && (
+            <div
+                className="winning-line-highlight absolute inset-[3px] rounded-[12px] pointer-events-none z-30"
+                style={{ '--win-delay': `${winningOrder * 140}ms` }}
+            ></div>
         )}
     </div>
 );
@@ -259,15 +309,37 @@ function App() {
     const [diceRolling, setDiceRolling] = useState(false);
     const [winner, setWinner] = useState(null);
     const [notification, setNotification] = useState('');
+    const [isResolving, setIsResolving] = useState(false);
+    const [winningLine, setWinningLine] = useState([]);
+    const sequenceTimersRef = useRef([]);
+
+    const clearSequenceTimers = () => {
+        sequenceTimersRef.current.forEach(clearTimeout);
+        sequenceTimersRef.current = [];
+    };
+
+    const queueSequence = (callback, delay) => {
+        const timerId = setTimeout(() => {
+            sequenceTimersRef.current = sequenceTimersRef.current.filter(id => id !== timerId);
+            callback();
+        }, delay);
+        sequenceTimersRef.current.push(timerId);
+        return timerId;
+    };
+
+    useEffect(() => () => clearSequenceTimers(), []);
 
     // --- GAME ACTIONS ---
     const startGame = (nextMatch = false) => {
+        clearSequenceTimers();
         setBoard(generateGame());
         setGamePhase('playing');
         setCurrentRoll(null);
         setWinner(null);
         setNotification('');
-        
+        setIsResolving(false);
+        setWinningLine([]);
+
         if (!nextMatch) {
             setScores({ p1: 0, p2: 0 });
             setRoundNumber(1);
@@ -279,77 +351,103 @@ function App() {
         }
     };
 
+    const returnToSetup = () => {
+        clearSequenceTimers();
+        setIsResolving(false);
+        setWinningLine([]);
+        setNotification('');
+        setCurrentRoll(null);
+        setWinner(null);
+        setGamePhase('setup');
+    };
+
+    const finishResolvedMove = (resolvedBoard, playerId) => {
+        const line = findWinningLine(resolvedBoard, playerId);
+        if (line) {
+            setWinningLine(line);
+            setNotification('Four in a row!');
+
+            // Let the four winning counters sweep/pulse before the modal appears.
+            queueSequence(() => {
+                setWinner(playerId);
+                setScores(prev => ({ ...prev, [playerId]: prev[playerId] + 1 }));
+                setNotification('');
+                setIsResolving(false);
+                setGamePhase('gameOver');
+            }, 2800);
+            return;
+        }
+
+        if (!resolvedBoard.some(c => c.value > 0 && c.owner === null)) {
+            queueSequence(() => {
+                setWinner('draw');
+                setIsResolving(false);
+                setGamePhase('gameOver');
+            }, 600);
+            return;
+        }
+
+        setIsResolving(false);
+        setCurrentPlayer(prev => prev === 'p1' ? 'p2' : 'p1');
+    };
+
     const handleRoll = () => {
-        if (gamePhase !== 'playing' || diceRolling || currentRoll !== null) return;
+        if (gamePhase !== 'playing' || diceRolling || currentRoll !== null || isResolving) return;
         setDiceRolling(true);
-        
+
         const result = Math.floor(Math.random() * 6) + 1;
-        setDiceTarget(result); 
-        
-        setTimeout(() => {
+        setDiceTarget(result);
+
+        queueSequence(() => {
             setDiceRolling(false);
             setCurrentRoll(result);
-            
-            setBoard(currentBoardState => {
-                const hasValidMoves = currentBoardState.some(c => c.value === result && c.owner === null);
-                if (!hasValidMoves) {
-                    setNotification(`No ${result}s left! Turn skipped.`);
-                    setTimeout(() => {
-                        setNotification('');
-                        setCurrentPlayer(prev => prev === 'p1' ? 'p2' : 'p1');
-                        setCurrentRoll(null);
-                    }, 2000);
-                }
-                return currentBoardState;
-            });
+
+            const hasValidMoves = board.some(c => c.value === result && c.owner === null);
+            if (!hasValidMoves) {
+                setIsResolving(true);
+                setNotification(`No ${result}s left! Turn skipped.`);
+                queueSequence(() => {
+                    setNotification('');
+                    setCurrentPlayer(prev => prev === 'p1' ? 'p2' : 'p1');
+                    setCurrentRoll(null);
+                    setIsResolving(false);
+                }, 2000);
+            }
         }, 1200);
     };
 
     const handleCellClick = (index) => {
-        if (gamePhase !== 'playing' || diceRolling || currentRoll === null) return;
-        
-        setBoard(currentBoardState => {
-            const cell = currentBoardState[index];
-            if (cell.owner !== null || cell.value !== currentRoll) return currentBoardState;
-            
-            let newBoard = [...currentBoardState];
-            newBoard[index] = { ...newBoard[index], owner: currentPlayer };
-            
-            const wildResult = claimWilds(newBoard, currentPlayer);
-            newBoard = wildResult.newBoard;
-            
-            setCurrentRoll(null);
-            
-            if (wildResult.changed) {
-                setNotification('Bonus Tile Claimed!');
-                setTimeout(() => setNotification(''), 1500);
-            }
-            
-            if (checkWin(newBoard, currentPlayer)) {
-                setTimeout(() => {
-                    setWinner(currentPlayer);
-                    setGamePhase('gameOver');
-                    setScores(prev => ({ ...prev, [currentPlayer]: prev[currentPlayer] + 1 }));
-                }, 600);
-                return newBoard;
-            }
-            
-            if (!newBoard.some(c => c.value > 0 && c.owner === null)) {
-                setTimeout(() => {
-                    setWinner('draw');
-                    setGamePhase('gameOver');
-                }, 600);
-                return newBoard;
-            }
-            
-            setCurrentPlayer(prev => prev === 'p1' ? 'p2' : 'p1');
-            return newBoard;
-        });
+        if (gamePhase !== 'playing' || diceRolling || currentRoll === null || isResolving) return;
+
+        const cell = board[index];
+        if (!cell || cell.owner !== null || cell.value !== currentRoll) return;
+
+        const playerId = currentPlayer;
+        const placedBoard = [...board];
+        placedBoard[index] = { ...placedBoard[index], owner: playerId, isBonus: false };
+
+        setBoard(placedBoard);
+        setCurrentRoll(null);
+        setIsResolving(true);
+
+        const wildResult = claimWilds(placedBoard, playerId);
+        if (wildResult.bonusIndices.length > 0) {
+            setNotification(wildResult.bonusIndices.length > 1 ? 'Bonus Tiles Claimed!' : 'Bonus Tile Claimed!');
+
+            // Keep the bonus square empty for a beat, then place its starred counter.
+            queueSequence(() => {
+                setBoard(wildResult.newBoard);
+                setNotification('');
+                finishResolvedMove(wildResult.newBoard, playerId);
+            }, 1000);
+        } else {
+            finishResolvedMove(placedBoard, playerId);
+        }
     };
 
     // --- AI BOT LOGIC ---
     useEffect(() => {
-        if (gamePhase !== 'playing' || currentPlayer !== 'p2' || !players.p2.isBot) return;
+        if (gamePhase !== 'playing' || currentPlayer !== 'p2' || !players.p2.isBot || isResolving) return;
 
         let timeoutId;
         if (currentRoll === null && !diceRolling) {
@@ -416,7 +514,7 @@ function App() {
             }
         }
         return () => clearTimeout(timeoutId);
-    }, [currentPlayer, currentRoll, gamePhase, diceRolling, players.p2.isBot, board]);
+    }, [currentPlayer, currentRoll, gamePhase, diceRolling, players.p2.isBot, board, isResolving]);
 
     /* ==========================================================================
        RENDER: SETUP VIEW
@@ -520,10 +618,12 @@ function App() {
     ========================================================================== */
     const renderPlaying = () => {
         const isBotTurn = currentPlayer === 'p2' && players.p2.isBot;
-        const isRollDisabled = gamePhase !== 'playing' || diceRolling || currentRoll !== null || isBotTurn;
+        const isRollDisabled = gamePhase !== 'playing' || diceRolling || currentRoll !== null || isBotTurn || isResolving;
 
         let actionText = 'ROLL DICE';
-        if (diceRolling) actionText = 'ROLLING...';
+        if (winningLine.length > 0) actionText = 'WINNER!';
+        else if (isResolving) actionText = 'RESOLVING...';
+        else if (diceRolling) actionText = 'ROLLING...';
         else if (currentRoll !== null && isBotTurn) actionText = 'PLACING...';
         else if (currentRoll !== null) actionText = 'PLACE TILE';
         else if (isBotTurn) actionText = 'THINKING...';
@@ -552,7 +652,7 @@ function App() {
                     
                     {/* HEADER */}
                     <div className="playing-header px-5 pt-8 sm:pt-6 pb-4 flex justify-between items-center z-10 relative">
-                        <button onClick={() => setGamePhase('setup')} className="w-12 h-12 bg-white/40 hover:bg-white/60 rounded-[14px] flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors text-[#5a9a9c]">
+                        <button onClick={returnToSetup} className="w-12 h-12 bg-white/40 hover:bg-white/60 rounded-[14px] flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors text-[#5a9a9c]">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
                         
@@ -581,13 +681,29 @@ function App() {
                                         {[0, 1, 2].map(d => {
                                             const c1 = board[r * 6 + d * 2];
                                             const c2 = board[r * 6 + d * 2 + 1];
-                                            const isValid1 = gamePhase === 'playing' && !diceRolling && currentRoll !== null && c1.value === currentRoll && c1.owner === null;
-                                            const isValid2 = gamePhase === 'playing' && !diceRolling && currentRoll !== null && c2.value === currentRoll && c2.owner === null;
-                                            
+                                            const isValid1 = gamePhase === 'playing' && !diceRolling && !isResolving && currentRoll !== null && c1.value === currentRoll && c1.owner === null;
+                                            const isValid2 = gamePhase === 'playing' && !diceRolling && !isResolving && currentRoll !== null && c2.value === currentRoll && c2.owner === null;
+                                            const winningOrder1 = winningLine.indexOf(c1.id);
+                                            const winningOrder2 = winningLine.indexOf(c2.id);
+
                                             return (
                                                 <div key={d} className="flex bg-[#fbe6d3] rounded-[15px] shadow-[0_3px_5px_rgba(0,0,0,0.15)] border-b-[3px] border-[#d4bca4] overflow-hidden">
-                                                    <Cell cell={c1} onClick={() => !isBotTurn && handleCellClick(c1.id)} isValid={isValid1} isLeft={true} />
-                                                    <Cell cell={c2} onClick={() => !isBotTurn && handleCellClick(c2.id)} isValid={isValid2} isLeft={false} />
+                                                    <Cell
+                                                        cell={c1}
+                                                        onClick={() => !isBotTurn && handleCellClick(c1.id)}
+                                                        isValid={isValid1}
+                                                        isLeft={true}
+                                                        isWinning={winningOrder1 !== -1}
+                                                        winningOrder={winningOrder1 === -1 ? 0 : winningOrder1}
+                                                    />
+                                                    <Cell
+                                                        cell={c2}
+                                                        onClick={() => !isBotTurn && handleCellClick(c2.id)}
+                                                        isValid={isValid2}
+                                                        isLeft={false}
+                                                        isWinning={winningOrder2 !== -1}
+                                                        winningOrder={winningOrder2 === -1 ? 0 : winningOrder2}
+                                                    />
                                                 </div>
                                             );
                                         })}
@@ -649,7 +765,7 @@ function App() {
                                     <button onClick={() => startGame(true)} className="font-poetsen-one w-full bg-gradient-to-b from-[#ffd659] to-[#f09600] text-[#7a4b00] text-lg py-4 rounded-full shadow-[0_6px_0_#c27a00] active:shadow-[0_0px_0_#c27a00] active:translate-y-[6px] transition-all">
                                         PLAY ROUND {roundNumber + 1}
                                     </button>
-                                    <button onClick={() => setGamePhase('setup')} className="font-poetsen-one w-full bg-gray-100/50 hover:bg-gray-200/80 text-gray-800 text-lg py-4 rounded-full shadow-[0_6px_0_rgba(0,0,0,0.1)] active:shadow-[0_0px_0_rgba(0,0,0,0.1)] active:translate-y-[6px] transition-all backdrop-blur-sm border border-black/10">
+                                    <button onClick={returnToSetup} className="font-poetsen-one w-full bg-gray-100/50 hover:bg-gray-200/80 text-gray-800 text-lg py-4 rounded-full shadow-[0_6px_0_rgba(0,0,0,0.1)] active:shadow-[0_0px_0_rgba(0,0,0,0.1)] active:translate-y-[6px] transition-all backdrop-blur-sm border border-black/10">
                                         MAIN MENU
                                     </button>
                                 </div>
