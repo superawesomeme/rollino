@@ -425,7 +425,7 @@ function App() {
         <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
                 <div className="flex justify-center mb-8">
-                    <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-72 h-auto max-w-full drop-shadow-md" />
+                    <img src="images/rollino-logo.png" alt="Rollino Logo" className="w-72 h-auto max-w-full drop-shadow-md" />
                 </div>
                 
                 <div className="space-y-6 mb-8 text-left">
@@ -557,7 +557,7 @@ function App() {
                         </button>
                         
                         <div className="flex items-center justify-center flex-1 px-3">
-                            <img src="images/rollino-logo.svg" alt="Rollino Logo" className="w-60 h-auto drop-shadow-md" />
+                            <img src="images/rollino-logo.png" alt="Rollino Logo" className="w-60 h-auto drop-shadow-md" />
                         </div>
                         
                         <div className="bg-[#6b9ca3]/80 backdrop-blur-md px-3 py-2 rounded-full flex gap-3 items-center shadow-inner border border-white/20">
