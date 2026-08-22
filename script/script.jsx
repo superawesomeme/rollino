@@ -12,6 +12,33 @@ const DICE_ROTATIONS = {
     6: { x: 180, y: 0 }
 };
 
+// Keep all counter paths in one place. The bonus art gets a small version token so
+// GitHub Pages/browser caches cannot keep serving an earlier missing/stale response.
+const BONUS_ASSET_VERSION = '20260822a';
+const COUNTER_IMAGES = {
+    red: {
+        normal: 'images/counter-red.png',
+        bonus: `images/counter-red-bonus.png?v=${BONUS_ASSET_VERSION}`
+    },
+    blue: {
+        normal: 'images/counter-blue.png',
+        bonus: `images/counter-blue-bonus.png?v=${BONUS_ASSET_VERSION}`
+    }
+};
+
+// Start loading/decoding the bonus artwork as soon as the game script is evaluated,
+// long before a bonus can normally be earned. The <link rel="preload"> tags in
+// index.html start the same requests even earlier while the document is parsing.
+Object.values(COUNTER_IMAGES).forEach(({ bonus }) => {
+    const image = new Image();
+    image.src = bonus;
+    if (typeof image.decode === 'function') {
+        image.decode().catch(() => {
+            // A later <img> render still gets its own load/error handling.
+        });
+    }
+});
+
 const hasInvalidBlankPlacement = (board) => {
     for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 6; c++) {
@@ -226,19 +253,38 @@ const PipLayout = ({ val, recessed = false }) => {
     );
 };
 
-const Token = ({ color, isBonus = false, isWinning = false, winningOrder = 0 }) => (
-    <div
-        className={`board-counter-position absolute z-20 ${isBonus ? 'bonus-counter' : ''} ${isWinning ? 'winning-counter' : ''}`}
-        style={isWinning ? { '--win-delay': `${winningOrder * 140}ms` } : undefined}
-    >
-        <img
-            src={`images/counter-${color}${isBonus ? '-bonus' : ''}.png`}
-            alt=""
-            aria-hidden="true"
-            className="counter-art board-counter-art w-full h-full"
-        />
-    </div>
-);
+const Token = ({ color, isBonus = false, isWinning = false, winningOrder = 0 }) => {
+    const imageSet = COUNTER_IMAGES[color];
+    const requestedSrc = isBonus ? imageSet.bonus : imageSet.normal;
+
+    const handleImageError = (event) => {
+        // If the dedicated bonus image ever fails to load (for example during a
+        // GitHub Pages deploy), keep the counter visible instead of leaving a hole.
+        // The console message makes the failing URL obvious when debugging remotely.
+        if (isBonus && event.currentTarget.dataset.fallbackApplied !== 'true') {
+            console.warn(`Bonus counter image failed to load: ${requestedSrc}. Falling back to ${imageSet.normal}.`);
+            event.currentTarget.dataset.fallbackApplied = 'true';
+            event.currentTarget.src = imageSet.normal;
+        }
+    };
+
+    return (
+        <div
+            className={`board-counter-position absolute z-20 ${isBonus ? 'bonus-counter' : ''} ${isWinning ? 'winning-counter' : ''}`}
+            style={isWinning ? { '--win-delay': `${winningOrder * 140}ms` } : undefined}
+        >
+            <img
+                src={requestedSrc}
+                alt=""
+                aria-hidden="true"
+                loading="eager"
+                decoding="async"
+                onError={handleImageError}
+                className="counter-art board-counter-art w-full h-full"
+            />
+        </div>
+    );
+};
 
 const Cell = ({ cell, onClick, isValid, isLeft, isWinning = false, winningOrder = 0 }) => (
     <div
