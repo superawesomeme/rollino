@@ -12,9 +12,9 @@ const DICE_ROTATIONS = {
     6: { x: 180, y: 0 }
 };
 
-// Keep all counter paths in one place. The bonus art gets a small version token so
-// GitHub Pages/browser caches cannot keep serving an earlier missing/stale response.
-const BONUS_ASSET_VERSION = '20260822a';
+// Keep all counter paths in one place. The bonus art gets a version token so a
+// newly deployed asset cannot be confused with an older cached response.
+const BONUS_ASSET_VERSION = '20260822b';
 const COUNTER_IMAGES = {
     red: {
         normal: 'images/counter-red.png',
@@ -26,17 +26,64 @@ const COUNTER_IMAGES = {
     }
 };
 
-// Start loading/decoding the bonus artwork as soon as the game script is evaluated,
-// long before a bonus can normally be earned. The <link rel="preload"> tags in
-// index.html start the same requests even earlier while the document is parsing.
-Object.values(COUNTER_IMAGES).forEach(({ bonus }) => {
+// Hold strong references to preloaded Image objects for the lifetime of the page.
+// This makes the dynamically inserted bonus artwork much more reliable on mobile.
+const COUNTER_IMAGE_CACHE = new Map();
+const BONUS_IMAGE_OVERRIDES = { red: null, blue: null };
+
+const loadAndDecodeCounterImage = (src) => {
+    const cached = COUNTER_IMAGE_CACHE.get(src);
+    if (cached) return cached.promise;
+
     const image = new Image();
-    image.src = bonus;
-    if (typeof image.decode === 'function') {
-        image.decode().catch(() => {
-            // A later <img> render still gets its own load/error handling.
-        });
+    image.decoding = 'async';
+
+    const promise = new Promise((resolve, reject) => {
+        image.onload = async () => {
+            try {
+                if (typeof image.decode === 'function') await image.decode();
+            } catch (error) {
+                // The load event already proves the bytes arrived. A redundant decode()
+                // rejection should not make an otherwise valid image unusable.
+            }
+            resolve(src);
+        };
+        image.onerror = () => reject(new Error(`Could not load counter image: ${src}`));
+        image.src = src;
+    });
+
+    // Retaining both the element and promise keeps the resource alive and lets every
+    // later request share the same in-flight/completed load.
+    COUNTER_IMAGE_CACHE.set(src, { image, promise });
+    return promise;
+};
+
+const getCounterImageSrc = (color, isBonus = false) => {
+    if (!isBonus) return COUNTER_IMAGES[color].normal;
+    return BONUS_IMAGE_OVERRIDES[color] || COUNTER_IMAGES[color].bonus;
+};
+
+const ensureBonusCounterReady = async (color) => {
+    const primarySrc = getCounterImageSrc(color, true);
+
+    try {
+        await loadAndDecodeCounterImage(primarySrc);
+        return primarySrc;
+    } catch (firstError) {
+        // Retry once with a unique URL if a transient cached/CDN response fails.
+        const separator = COUNTER_IMAGES[color].bonus.includes('?') ? '&' : '?';
+        const retrySrc = `${COUNTER_IMAGES[color].bonus}${separator}retry=${Date.now()}`;
+        console.warn(`Retrying bonus counter image after load failure: ${primarySrc}`);
+        await loadAndDecodeCounterImage(retrySrc);
+        BONUS_IMAGE_OVERRIDES[color] = retrySrc;
+        return retrySrc;
     }
+};
+
+// Prime all normal and bonus graphics at startup and retain them in memory.
+Object.values(COUNTER_IMAGES).forEach(({ normal, bonus }) => {
+    loadAndDecodeCounterImage(normal).catch(() => {});
+    loadAndDecodeCounterImage(bonus).catch(() => {});
 });
 
 const hasInvalidBlankPlacement = (board) => {
@@ -255,7 +302,7 @@ const PipLayout = ({ val, recessed = false }) => {
 
 const Token = ({ color, isBonus = false, isWinning = false, winningOrder = 0 }) => {
     const imageSet = COUNTER_IMAGES[color];
-    const requestedSrc = isBonus ? imageSet.bonus : imageSet.normal;
+    const requestedSrc = getCounterImageSrc(color, isBonus);
 
     const handleImageError = (event) => {
         // If the dedicated bonus image ever fails to load (for example during a
@@ -278,7 +325,7 @@ const Token = ({ color, isBonus = false, isWinning = false, winningOrder = 0 }) 
                 alt=""
                 aria-hidden="true"
                 loading="eager"
-                decoding="async"
+                decoding="sync"
                 onError={handleImageError}
                 className="counter-art board-counter-art w-full h-full"
             />
@@ -488,16 +535,26 @@ function App() {
         if (wildResult.bonusIndices.length > 0) {
             setNotification(wildResult.bonusIndices.length > 1 ? 'Bonus Tiles Claimed!' : 'Bonus Tile Claimed!');
 
-            // Leave the bonus square empty for a beat, then bounce in the dedicated
-            // bonus counter artwork. Hold the message for another second so the
-            // player has time to register what happened before the turn resolves.
+            // Leave the bonus square empty for a beat. At the end of that delay,
+            // do not reveal the bonus counter until its PNG has actually loaded and
+            // decoded. This prevents an empty image frame on mobile browsers.
             queueSequence(() => {
-                setBoard(wildResult.newBoard);
+                const bonusColor = playerId === 'p1' ? 'red' : 'blue';
 
-                queueSequence(() => {
-                    setNotification('');
-                    finishResolvedMove(wildResult.newBoard, playerId);
-                }, 1000);
+                ensureBonusCounterReady(bonusColor)
+                    .catch((error) => {
+                        // Rendering still has an onError fallback to the normal counter,
+                        // so gameplay can continue even if both network attempts fail.
+                        console.warn(error);
+                    })
+                    .finally(() => {
+                        setBoard(wildResult.newBoard);
+
+                        queueSequence(() => {
+                            setNotification('');
+                            finishResolvedMove(wildResult.newBoard, playerId);
+                        }, 1000);
+                    });
             }, 500);
         } else {
             finishResolvedMove(placedBoard, playerId);
