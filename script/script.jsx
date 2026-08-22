@@ -223,12 +223,11 @@ const Token = ({ color, isBonus = false, isWinning = false, winningOrder = 0 }) 
         style={isWinning ? { '--win-delay': `${winningOrder * 140}ms` } : undefined}
     >
         <img
-            src={`images/counter-${color}.png`}
+            src={`images/counter-${color}${isBonus ? '-bonus' : ''}.png`}
             alt=""
             aria-hidden="true"
             className="counter-art board-counter-art w-full h-full"
         />
-        {isBonus && <span className="bonus-star" aria-hidden="true">★</span>}
     </div>
 );
 
@@ -434,12 +433,12 @@ function App() {
         if (wildResult.bonusIndices.length > 0) {
             setNotification(wildResult.bonusIndices.length > 1 ? 'Bonus Tiles Claimed!' : 'Bonus Tile Claimed!');
 
-            // Keep the bonus square empty for a beat, then place its starred counter.
+            // Keep the bonus square empty briefly, then place the dedicated bonus counter artwork.
             queueSequence(() => {
                 setBoard(wildResult.newBoard);
                 setNotification('');
                 finishResolvedMove(wildResult.newBoard, playerId);
-            }, 1000);
+            }, 500);
         } else {
             finishResolvedMove(placedBoard, playerId);
         }
@@ -520,8 +519,8 @@ function App() {
        RENDER: SETUP VIEW
     ========================================================================== */
     const renderSetup = () => (
-        <div className="setup-viewport min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
-            <div className="bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
+        <div className="setup-view min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+            <div className="setup-panel bg-white/90 backdrop-blur-md p-8 rounded-[32px] shadow-2xl w-full max-w-sm text-center relative z-10">
                 <div className="flex justify-center mb-8">
                     <img src="images/rollino-logo.png" alt="Rollino Logo" className="w-72 h-auto max-w-full drop-shadow-md" />
                 </div>
