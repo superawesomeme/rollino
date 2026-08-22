@@ -54,13 +54,16 @@
 
 /* Bonus counters use dedicated artwork and arrive after the short pause. */
 .bonus-counter .board-counter-art {
-  animation: bonus-counter-arrive 420ms cubic-bezier(0.18, 0.9, 0.25, 1.25) both;
+  animation: bonus-counter-bounce 700ms cubic-bezier(0.22, 0.9, 0.28, 1.2) both;
+  transform-origin: 50% 50%;
 }
 
-@keyframes bonus-counter-arrive {
-  0% { transform: scale(0.62); opacity: 0; }
-  70% { transform: scale(1.08); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+@keyframes bonus-counter-bounce {
+  0%   { transform: translateY(-12%) scale(0.72); opacity: 0; }
+  48%  { transform: translateY(-7%) scale(1.12); opacity: 1; }
+  68%  { transform: translateY(3%) scale(0.96); opacity: 1; }
+  84%  { transform: translateY(-2%) scale(1.04); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 /* Winning line: a short staggered gold sweep before the winner modal appears. */

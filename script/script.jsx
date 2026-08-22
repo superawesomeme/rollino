@@ -12,13 +12,22 @@ const DICE_ROTATIONS = {
     6: { x: 180, y: 0 }
 };
 
-const hasAdjacentBlanks = (board) => {
+const hasInvalidBlankPlacement = (board) => {
     for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 6; c++) {
             const i = r * 6 + c;
             if (board[i].value !== 0) continue;
+
+            // Corner blanks can never be flanked on both sides, so reject them.
+            const isCorner = (r === 0 || r === 5) && (c === 0 || c === 5);
+            if (isCorner) return true;
+
+            // Keep blank squares separated in every direction. This prevents
+            // horizontal, vertical and diagonal blank chains/cascades.
             if (c < 5 && board[i + 1].value === 0) return true;
             if (r < 5 && board[i + 6].value === 0) return true;
+            if (r < 5 && c < 5 && board[i + 7].value === 0) return true;
+            if (r < 5 && c > 0 && board[i + 5].value === 0) return true;
         }
     }
     return false;
@@ -32,9 +41,9 @@ const generateGame = () => {
         }
     }
 
-    // Rebuild until no two blank halves touch horizontally or vertically.
-    // With at most six blank halves in a 6x6 board this resolves very quickly,
-    // while retaining the existing random selection/orientation behaviour.
+    // Rebuild until blanks are never in corners and never touch another blank
+    // horizontally, vertically or diagonally. This keeps every blank useful and
+    // prevents bonus-capture chains caused purely by adjacent blank squares.
     for (;;) {
         const shuffled = [...all];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -56,7 +65,7 @@ const generateGame = () => {
             }
         }
 
-        if (!hasAdjacentBlanks(newBoard)) return newBoard;
+        if (!hasInvalidBlankPlacement(newBoard)) return newBoard;
     }
 
 
@@ -433,11 +442,16 @@ function App() {
         if (wildResult.bonusIndices.length > 0) {
             setNotification(wildResult.bonusIndices.length > 1 ? 'Bonus Tiles Claimed!' : 'Bonus Tile Claimed!');
 
-            // Keep the bonus square empty briefly, then place the dedicated bonus counter artwork.
+            // Leave the bonus square empty for a beat, then bounce in the dedicated
+            // bonus counter artwork. Hold the message for another second so the
+            // player has time to register what happened before the turn resolves.
             queueSequence(() => {
                 setBoard(wildResult.newBoard);
-                setNotification('');
-                finishResolvedMove(wildResult.newBoard, playerId);
+
+                queueSequence(() => {
+                    setNotification('');
+                    finishResolvedMove(wildResult.newBoard, playerId);
+                }, 1000);
             }, 500);
         } else {
             finishResolvedMove(placedBoard, playerId);
